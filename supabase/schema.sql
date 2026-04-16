@@ -29,6 +29,12 @@ CREATE POLICY "Allow public insert"
   ON jersey_signups FOR INSERT
   WITH CHECK (true);
 
--- 5. Enable real-time for this table
+-- 5. Allow anyone to update (editing jersey number / size)
+CREATE POLICY "Allow public update"
+  ON jersey_signups FOR UPDATE
+  USING (true)
+  WITH CHECK (true);
+
+-- 6. Enable real-time for this table
 --    (Supabase > Database > Replication — or run this SQL)
 ALTER PUBLICATION supabase_realtime ADD TABLE jersey_signups;

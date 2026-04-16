@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase, type JerseySignup } from '@/lib/supabase'
 import SignupModal from './SignupModal'
+import EditModal from './EditModal'
 
 const SIZE_COLORS: Record<string, string> = {
   S:  'bg-blue-100 text-blue-700',
@@ -18,17 +19,16 @@ interface JerseyGridProps {
 export default function JerseyGrid({ initialSignups }: JerseyGridProps) {
   const [signups, setSignups] = useState<JerseySignup[]>(initialSignups)
   const [selectedNumber, setSelectedNumber] = useState<number | null>(null)
+  const [editingSignup, setEditingSignup] = useState<JerseySignup | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [customInput, setCustomInput] = useState('')
 
-  // Ref so the real-time callback can read current selectedNumber without
-  // being re-created every time it changes (avoids subscription churn).
   const selectedRef = useRef<number | null>(null)
   useEffect(() => {
     selectedRef.current = selectedNumber
   }, [selectedNumber])
 
-  // Subscribe to real-time INSERT events
+  // Subscribe to real-time INSERT and UPDATE events
   useEffect(() => {
     const channel = supabase
       .channel('jersey_signups_realtime')
@@ -46,6 +46,16 @@ export default function JerseyGrid({ initialSignups }: JerseyGridProps) {
             )
             setSelectedNumber(null)
           }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'jersey_signups' },
+        (payload) => {
+          const updated = payload.new as JerseySignup
+          setSignups((prev) =>
+            prev.map((s) => (s.id === updated.id ? updated : s))
+          )
         }
       )
       .subscribe()
@@ -88,9 +98,17 @@ export default function JerseyGrid({ initialSignups }: JerseyGridProps) {
     setSelectedNumber(null)
   }
 
+  const handleEditSuccess = (updated: JerseySignup) => {
+    setSignups((prev) =>
+      prev.map((s) => (s.id === updated.id ? updated : s))
+    )
+    setEditingSignup(null)
+  }
+
   const handleError = (message: string) => {
     setError(message)
     setSelectedNumber(null)
+    setEditingSignup(null)
   }
 
   const sortedSignups = [...signups].sort((a, b) => a.jersey_number - b.jersey_number)
@@ -209,6 +227,7 @@ export default function JerseyGrid({ initialSignups }: JerseyGridProps) {
                 <th className="pb-2 text-center w-24">Jersey #</th>
                 <th className="pb-2 text-center">Player Name</th>
                 <th className="pb-2 text-right w-16">Size</th>
+                <th className="pb-2 w-10"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -225,6 +244,20 @@ export default function JerseyGrid({ initialSignups }: JerseyGridProps) {
                       {s.size}
                     </span>
                   </td>
+                  <td className="py-2.5 text-right">
+                    <button
+                      onClick={() => {
+                        setEditingSignup(s)
+                        setError(null)
+                      }}
+                      className="text-gray-300 hover:text-blue-500 transition-colors"
+                      title={`Edit ${s.player_name}`}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                      </svg>
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -237,6 +270,16 @@ export default function JerseyGrid({ initialSignups }: JerseyGridProps) {
           jerseyNumber={selectedNumber}
           onClose={() => setSelectedNumber(null)}
           onSuccess={handleSuccess}
+          onError={handleError}
+        />
+      )}
+
+      {editingSignup !== null && (
+        <EditModal
+          signup={editingSignup}
+          takenNumbers={takenNumbers}
+          onClose={() => setEditingSignup(null)}
+          onSuccess={handleEditSuccess}
           onError={handleError}
         />
       )}
