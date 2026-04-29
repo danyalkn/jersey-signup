@@ -22,6 +22,18 @@ export default function JerseyGrid({ initialSignups }: JerseyGridProps) {
   const [editingSignup, setEditingSignup] = useState<JerseySignup | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [customInput, setCustomInput] = useState('')
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  const handleCopyEmail = async (signup: JerseySignup) => {
+    if (!signup.email) return
+    try {
+      await navigator.clipboard.writeText(signup.email)
+      setCopiedId(signup.id)
+      setTimeout(() => setCopiedId((id) => (id === signup.id ? null : id)), 1500)
+    } catch {
+      // ignore — clipboard not available
+    }
+  }
 
   const selectedRef = useRef<number | null>(null)
   useEffect(() => {
@@ -235,7 +247,32 @@ export default function JerseyGrid({ initialSignups }: JerseyGridProps) {
               {sortedSignups.map((s) => (
                 <tr key={s.id}>
                   <td className="py-2.5 font-black text-gray-800 text-center">{s.jersey_number}</td>
-                  <td className="py-2.5 font-medium text-gray-700 text-center">{s.player_name}</td>
+                  <td className="py-2.5 font-medium text-gray-700 text-center">
+                    <span className="inline-flex items-center gap-1.5">
+                      {s.player_name}
+                      {s.email && (
+                        <button
+                          onClick={() => handleCopyEmail(s)}
+                          title={copiedId === s.id ? 'Copied!' : `Copy ${s.email}`}
+                          className={`inline-flex items-center justify-center w-5 h-5 rounded-md transition-all ${
+                            copiedId === s.id
+                              ? 'bg-green-100 text-green-600 scale-110'
+                              : 'text-gray-300 hover:text-blue-500 hover:bg-blue-50'
+                          }`}
+                        >
+                          {copiedId === s.id ? (
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : (
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                            </svg>
+                          )}
+                        </button>
+                      )}
+                    </span>
+                  </td>
                   <td className="py-2.5 text-right">
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold ${
