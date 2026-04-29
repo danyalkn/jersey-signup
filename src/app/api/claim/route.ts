@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
 const ALLOWED_SIZES = new Set(['S', 'M', 'L', 'XL'])
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export async function POST(request: NextRequest) {
   // Parse body safely
@@ -12,7 +13,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 })
   }
 
-  const { jersey_number, player_name, size } = body
+  const { jersey_number, player_name, email, size } = body
 
   // --- Input validation ---
   if (typeof jersey_number !== 'number' || !Number.isInteger(jersey_number)) {
@@ -30,6 +31,15 @@ export async function POST(request: NextRequest) {
   if (player_name.trim().length > 100) {
     return NextResponse.json(
       { error: 'Player name must be 100 characters or fewer.' },
+      { status: 400 }
+    )
+  }
+  if (typeof email !== 'string' || !EMAIL_REGEX.test(email.trim())) {
+    return NextResponse.json({ error: 'A valid email is required.' }, { status: 400 })
+  }
+  if (email.trim().length > 255) {
+    return NextResponse.json(
+      { error: 'Email must be 255 characters or fewer.' },
       { status: 400 }
     )
   }
@@ -54,6 +64,7 @@ export async function POST(request: NextRequest) {
     .insert({
       jersey_number,
       player_name: player_name.trim(),
+      email: email.trim().toLowerCase(),
       size,
     })
     .select()

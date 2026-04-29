@@ -21,6 +21,7 @@ export default function EditModal({
   onError,
 }: EditModalProps) {
   const [jerseyNumber, setJerseyNumber] = useState(signup.jersey_number.toString())
+  const [email, setEmail] = useState(signup.email ?? '')
   const [size, setSize] = useState(signup.size)
   const [submitting, setSubmitting] = useState(false)
 
@@ -35,7 +36,7 @@ export default function EditModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const num = parseInt(jerseyNumber, 10)
-    if (isNaN(num) || num < 1 || num > 999 || submitting) return
+    if (isNaN(num) || num < 1 || num > 999 || !email.trim() || submitting) return
 
     if (num !== signup.jersey_number && takenNumbers.has(num)) {
       onError(`Jersey #${num} is already taken.`)
@@ -47,7 +48,12 @@ export default function EditModal({
       const res = await fetch('/api/edit', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: signup.id, jersey_number: num, size }),
+        body: JSON.stringify({
+          id: signup.id,
+          jersey_number: num,
+          email: email.trim().toLowerCase(),
+          size,
+        }),
       })
       const json = await res.json()
       if (!res.ok) {
@@ -106,6 +112,27 @@ export default function EditModal({
           </div>
 
           <div>
+            <label
+              htmlFor="edit-email"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Email
+            </label>
+            <input
+              id="edit-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              maxLength={255}
+              required
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-900
+                placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400
+                focus:border-transparent transition"
+            />
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Jersey Size
             </label>
@@ -129,7 +156,7 @@ export default function EditModal({
 
           <button
             type="submit"
-            disabled={!jerseyNumber || submitting}
+            disabled={!jerseyNumber || !email.trim() || submitting}
             className="w-full bg-blue-500 text-white rounded-lg py-3 font-semibold
               hover:bg-blue-600 active:bg-blue-700
               disabled:opacity-40 disabled:cursor-not-allowed

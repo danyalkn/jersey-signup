@@ -69,6 +69,7 @@ export default function JerseyGrid({ initialSignups }: JerseyGridProps) {
   const gridTaken = Array.from({ length: 30 }, (_, i) => i + 1).filter((n) =>
     takenNumbers.has(n)
   ).length
+  const totalTaken = takenNumbers.size
 
   const handleNumberClick = (num: number) => {
     if (takenNumbers.has(num)) return
@@ -123,7 +124,7 @@ export default function JerseyGrid({ initialSignups }: JerseyGridProps) {
         </span>
         <span className="flex items-center gap-2">
           <span className="w-3.5 h-3.5 rounded bg-red-100 border border-red-200 inline-block" />
-          Taken ({gridTaken})
+          Taken ({totalTaken})
         </span>
       </div>
 

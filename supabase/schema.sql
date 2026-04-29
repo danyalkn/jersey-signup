@@ -11,6 +11,9 @@ CREATE TABLE IF NOT EXISTS jersey_signups (
   player_name   text        NOT NULL
                             CHECK (length(trim(player_name)) > 0
                               AND length(player_name) <= 100),
+  email         text        NOT NULL
+                            CHECK (length(trim(email)) > 0
+                              AND length(email) <= 255),
   size          text        NOT NULL
                             CHECK (size IN ('S', 'M', 'L', 'XL')),
   created_at    timestamptz DEFAULT now() NOT NULL

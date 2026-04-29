@@ -33,7 +33,7 @@ export default async function AdminPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-10 px-4">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="flex items-start justify-between mb-8">
           <div>
@@ -63,6 +63,7 @@ export default async function AdminPage() {
                 <tr className="bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                   <th className="px-5 py-3 text-left w-16">#</th>
                   <th className="px-5 py-3 text-left">Player</th>
+                  <th className="px-5 py-3 text-left">Email</th>
                   <th className="px-5 py-3 text-left w-20">Size</th>
                 </tr>
               </thead>
@@ -76,6 +77,18 @@ export default async function AdminPage() {
                     </td>
                     <td className="px-5 py-3.5 font-medium text-gray-900">
                       {s.player_name}
+                    </td>
+                    <td className="px-5 py-3.5 text-gray-600 text-xs">
+                      {s.email ? (
+                        <a
+                          href={`mailto:${s.email}`}
+                          className="hover:text-blue-600 transition-colors break-all"
+                        >
+                          {s.email}
+                        </a>
+                      ) : (
+                        <span className="text-gray-300">—</span>
+                      )}
                     </td>
                     <td className="px-5 py-3.5">
                       <span

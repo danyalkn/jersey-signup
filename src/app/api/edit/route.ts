@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
 const ALLOWED_SIZES = new Set(['S', 'M', 'L', 'XL'])
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export async function PATCH(request: NextRequest) {
   let body: Record<string, unknown>
@@ -11,7 +12,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 })
   }
 
-  const { id, jersey_number, size } = body
+  const { id, jersey_number, email, size } = body
 
   if (typeof id !== 'string' || id.length === 0) {
     return NextResponse.json({ error: 'id is required.' }, { status: 400 })
@@ -22,6 +23,15 @@ export async function PATCH(request: NextRequest) {
   if (jersey_number < 1 || jersey_number > 999) {
     return NextResponse.json(
       { error: 'Jersey number must be between 1 and 999.' },
+      { status: 400 }
+    )
+  }
+  if (typeof email !== 'string' || !EMAIL_REGEX.test(email.trim())) {
+    return NextResponse.json({ error: 'A valid email is required.' }, { status: 400 })
+  }
+  if (email.trim().length > 255) {
+    return NextResponse.json(
+      { error: 'Email must be 255 characters or fewer.' },
       { status: 400 }
     )
   }
@@ -40,7 +50,7 @@ export async function PATCH(request: NextRequest) {
 
   const { data, error } = await supabase
     .from('jersey_signups')
-    .update({ jersey_number, size })
+    .update({ jersey_number, email: email.trim().toLowerCase(), size })
     .eq('id', id)
     .select()
     .single()

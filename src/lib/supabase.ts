@@ -4,6 +4,7 @@ export type JerseySignup = {
   id: string
   jersey_number: number
   player_name: string
+  email: string
   size: string
   created_at: string
 }
