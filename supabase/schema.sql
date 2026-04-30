@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS jersey_signups (
                               AND length(email) <= 255),
   size          text        NOT NULL
                             CHECK (size IN ('S', 'M', 'L', 'XL')),
+  notified      boolean     NOT NULL DEFAULT false,
   created_at    timestamptz DEFAULT now() NOT NULL
 );
 

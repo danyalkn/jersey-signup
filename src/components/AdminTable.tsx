@@ -35,9 +35,35 @@ function buildCsv(signups: JerseySignup[]): string {
   return [header, ...rows].join('\n')
 }
 
-export default function AdminTable({ signups }: AdminTableProps) {
+export default function AdminTable({ signups: initialSignups }: AdminTableProps) {
+  const [signups, setSignups] = useState<JerseySignup[]>(initialSignups)
   const [copiedRow, setCopiedRow] = useState<string | null>(null)
   const [csvCopied, setCsvCopied] = useState(false)
+  const [pendingId, setPendingId] = useState<string | null>(null)
+
+  const toggleNotified = async (signup: JerseySignup) => {
+    const newValue = !signup.notified
+    // Optimistic update
+    setSignups((prev) =>
+      prev.map((s) => (s.id === signup.id ? { ...s, notified: newValue } : s))
+    )
+    setPendingId(signup.id)
+    try {
+      const res = await fetch('/api/notified', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: signup.id, notified: newValue }),
+      })
+      if (!res.ok) throw new Error('Failed')
+    } catch {
+      // Roll back on failure
+      setSignups((prev) =>
+        prev.map((s) => (s.id === signup.id ? { ...s, notified: !newValue } : s))
+      )
+    } finally {
+      setPendingId(null)
+    }
+  }
 
   const copyEmail = async (signup: JerseySignup) => {
     if (!signup.email) return
@@ -131,6 +157,7 @@ export default function AdminTable({ signups }: AdminTableProps) {
               <th className="px-5 py-3 text-left">Player</th>
               <th className="px-5 py-3 text-left">Email</th>
               <th className="px-5 py-3 text-left w-20">Size</th>
+              <th className="px-5 py-3 text-center w-16">Sent</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
@@ -178,6 +205,24 @@ export default function AdminTable({ signups }: AdminTableProps) {
                   >
                     {s.size}
                   </span>
+                </td>
+                <td className="px-5 py-3.5 text-center">
+                  <button
+                    onClick={() => toggleNotified(s)}
+                    disabled={pendingId === s.id}
+                    title={s.notified ? 'Mark as not sent' : 'Mark as emailed'}
+                    className={`inline-flex items-center justify-center w-6 h-6 rounded-md border-2 transition-all disabled:opacity-50 ${
+                      s.notified
+                        ? 'bg-green-500 border-green-500 text-white'
+                        : 'bg-white border-gray-300 hover:border-green-400'
+                    }`}
+                  >
+                    {s.notified && (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </button>
                 </td>
               </tr>
             ))}

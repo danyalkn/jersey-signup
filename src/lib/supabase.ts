@@ -6,6 +6,7 @@ export type JerseySignup = {
   player_name: string
   email: string
   size: string
+  notified: boolean
   created_at: string
 }
 
