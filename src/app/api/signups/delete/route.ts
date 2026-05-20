@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth'
 
-export async function PATCH(request: NextRequest) {
+export async function POST(request: NextRequest) {
   const authError = requireAdmin(request)
   if (authError) return authError
 
@@ -13,13 +13,9 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 })
   }
 
-  const { id, notified } = body
-
+  const { id } = body
   if (typeof id !== 'string' || id.length === 0) {
     return NextResponse.json({ error: 'id is required.' }, { status: 400 })
-  }
-  if (typeof notified !== 'boolean') {
-    return NextResponse.json({ error: 'notified must be a boolean.' }, { status: 400 })
   }
 
   const supabase = createClient(
@@ -28,17 +24,17 @@ export async function PATCH(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 
-  const { data, error } = await supabase
-    .from('jersey_signups')
-    .update({ notified })
-    .eq('id', id)
-    .select()
-    .single()
+  // FK from lineup_slots.player_id has ON DELETE SET NULL; lineup_subs.{bench,starter}_player_id
+  // have ON DELETE CASCADE. So deleting a signup automatically tidies up lineup state.
+  const { error } = await supabase.from('jersey_signups').delete().eq('id', id)
 
   if (error) {
-    console.error('[/api/notified] Supabase error:', error.message)
-    return NextResponse.json({ error: 'Failed to update.' }, { status: 500 })
+    console.error('[/api/signups/delete] Supabase error:', error.message)
+    return NextResponse.json(
+      { error: 'Failed to delete. Please try again.' },
+      { status: 500 }
+    )
   }
 
-  return NextResponse.json({ data })
+  return NextResponse.json({ data: { id } })
 }

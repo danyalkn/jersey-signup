@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { adminHeaders, useAdmin } from '@/lib/useAdmin'
 import type { JerseySignup } from '@/lib/supabase'
 
 const SIZES = ['S', 'M', 'L', 'XL'] as const
@@ -20,6 +21,8 @@ export default function EditModal({
   onSuccess,
   onError,
 }: EditModalProps) {
+  const { password } = useAdmin()
+  const [playerName, setPlayerName] = useState(signup.player_name)
   const [jerseyNumber, setJerseyNumber] = useState(signup.jersey_number.toString())
   const [email, setEmail] = useState(signup.email ?? '')
   const [size, setSize] = useState(signup.size)
@@ -36,7 +39,8 @@ export default function EditModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const num = parseInt(jerseyNumber, 10)
-    if (isNaN(num) || num < 1 || num > 999 || !email.trim() || submitting) return
+    if (isNaN(num) || num < 1 || num > 999 || !playerName.trim() || submitting)
+      return
 
     if (num !== signup.jersey_number && takenNumbers.has(num)) {
       onError(`Jersey #${num} is already taken.`)
@@ -47,11 +51,15 @@ export default function EditModal({
     try {
       const res = await fetch('/api/edit', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...adminHeaders(password),
+        },
         body: JSON.stringify({
           id: signup.id,
+          player_name: playerName.trim(),
           jersey_number: num,
-          email: email.trim().toLowerCase(),
+          email: email.trim().length === 0 ? null : email.trim().toLowerCase(),
           size,
         }),
       })
@@ -92,6 +100,26 @@ export default function EditModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label
+              htmlFor="edit-name"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Player Name
+            </label>
+            <input
+              id="edit-name"
+              type="text"
+              value={playerName}
+              onChange={(e) => setPlayerName(e.target.value)}
+              maxLength={100}
+              required
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-900
+                focus:outline-none focus:ring-2 focus:ring-blue-400
+                focus:border-transparent transition"
+            />
+          </div>
+
+          <div>
+            <label
               htmlFor="edit-number"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
@@ -116,7 +144,7 @@ export default function EditModal({
               htmlFor="edit-email"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Email
+              Email <span className="text-xs font-normal text-gray-400">(optional)</span>
             </label>
             <input
               id="edit-email"
@@ -125,7 +153,6 @@ export default function EditModal({
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               maxLength={255}
-              required
               className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-900
                 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400
                 focus:border-transparent transition"
@@ -156,7 +183,7 @@ export default function EditModal({
 
           <button
             type="submit"
-            disabled={!jerseyNumber || !email.trim() || submitting}
+            disabled={!jerseyNumber || !playerName.trim() || submitting}
             className="w-full bg-blue-500 text-white rounded-lg py-3 font-semibold
               hover:bg-blue-600 active:bg-blue-700
               disabled:opacity-40 disabled:cursor-not-allowed

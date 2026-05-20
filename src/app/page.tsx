@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
-import JerseyGrid from '@/components/JerseyGrid'
+import PublicRoster from '@/components/PublicRoster'
+import TopNav from '@/components/TopNav'
 import type { JerseySignup } from '@/lib/supabase'
 
-// Always fetch fresh on each request — real-time keeps the client updated after that
 export const revalidate = 0
 
 async function getSignups(): Promise<JerseySignup[]> {
@@ -26,19 +26,17 @@ export default async function HomePage() {
   const signups = await getSignups()
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-10 px-4">
-      <div className="max-w-lg mx-auto">
-        {/* Header */}
+    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 pb-10 px-4">
+      <TopNav />
+      <div className="max-w-lg mx-auto pt-6">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-black text-gray-900 tracking-tight">Praxis FC Jersey Signup</h1>
-          <p className="text-gray-500 mt-1 text-sm">Tap a green number to claim your jersey</p>
+          <h1 className="text-3xl font-black text-gray-900 tracking-tight">Praxis FC Roster</h1>
+          <p className="text-gray-500 mt-1 text-sm">Current jersey assignments</p>
         </div>
 
-        {/* Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6">
-          <JerseyGrid initialSignups={signups} />
+          <PublicRoster initialSignups={signups} />
         </div>
-
       </div>
     </main>
   )

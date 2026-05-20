@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
-import Link from 'next/link'
 import AdminTable from '@/components/AdminTable'
+import TopNav from '@/components/TopNav'
 import type { JerseySignup } from '@/lib/supabase'
 
 export const revalidate = 0
@@ -26,22 +26,15 @@ export default async function AdminPage() {
   const signups = await getSignups()
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-10 px-4">
-      <div className="max-w-3xl mx-auto">
+    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 pb-10 px-4">
+      <TopNav />
+      <div className="max-w-3xl mx-auto pt-6">
         {/* Header */}
-        <div className="flex items-start justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight">Roster</h1>
-            <p className="text-gray-500 mt-1 text-sm">
-              {signups.length} jerseys claimed
-            </p>
-          </div>
-          <Link
-            href="/"
-            className="text-sm text-blue-500 hover:text-blue-600 font-medium transition-colors mt-1"
-          >
-            ← Back to Grid
-          </Link>
+        <div className="mb-8">
+          <h1 className="text-3xl font-black text-gray-900 tracking-tight">Roster</h1>
+          <p className="text-gray-500 mt-1 text-sm">
+            {signups.length} jerseys claimed
+          </p>
         </div>
 
         <AdminTable signups={signups} />

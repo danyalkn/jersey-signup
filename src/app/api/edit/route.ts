@@ -1,10 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/auth'
 
 const ALLOWED_SIZES = new Set(['S', 'M', 'L', 'XL'])
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export async function PATCH(request: NextRequest) {
+  const authError = requireAdmin(request)
+  if (authError) return authError
+
   let body: Record<string, unknown>
   try {
     body = await request.json()
@@ -12,10 +15,19 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 })
   }
 
-  const { id, jersey_number, email, size } = body
+  const { id, player_name, jersey_number, email, size } = body
 
   if (typeof id !== 'string' || id.length === 0) {
     return NextResponse.json({ error: 'id is required.' }, { status: 400 })
+  }
+  if (typeof player_name !== 'string' || player_name.trim().length === 0) {
+    return NextResponse.json({ error: 'Player name is required.' }, { status: 400 })
+  }
+  if (player_name.trim().length > 100) {
+    return NextResponse.json(
+      { error: 'Player name must be 100 characters or fewer.' },
+      { status: 400 }
+    )
   }
   if (typeof jersey_number !== 'number' || !Number.isInteger(jersey_number)) {
     return NextResponse.json({ error: 'jersey_number must be an integer.' }, { status: 400 })
@@ -26,10 +38,17 @@ export async function PATCH(request: NextRequest) {
       { status: 400 }
     )
   }
-  if (typeof email !== 'string' || !EMAIL_REGEX.test(email.trim())) {
-    return NextResponse.json({ error: 'A valid email is required.' }, { status: 400 })
+  // Email is optional on edit so that legacy rows without an email (or with a
+  // non-format-conforming value) can still have their name/number/size edited.
+  // If a value is provided, we only enforce the length cap.
+  if (email !== null && email !== undefined && typeof email !== 'string') {
+    return NextResponse.json({ error: 'email must be a string.' }, { status: 400 })
   }
-  if (email.trim().length > 255) {
+  const normalizedEmail =
+    typeof email === 'string' && email.trim().length > 0
+      ? email.trim().toLowerCase()
+      : null
+  if (normalizedEmail !== null && normalizedEmail.length > 255) {
     return NextResponse.json(
       { error: 'Email must be 255 characters or fewer.' },
       { status: 400 }
@@ -50,7 +69,12 @@ export async function PATCH(request: NextRequest) {
 
   const { data, error } = await supabase
     .from('jersey_signups')
-    .update({ jersey_number, email: email.trim().toLowerCase(), size })
+    .update({
+      player_name: player_name.trim(),
+      jersey_number,
+      email: normalizedEmail,
+      size,
+    })
     .eq('id', id)
     .select()
     .single()
