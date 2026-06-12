@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS lineup_slots (
   position_code text        CHECK (
                               (slot_index BETWEEN 0 AND 10
                                 AND position_code IN
-                                  ('GK','CB','LB','RB','CDM','CM','CAM','LM','RM','LW','RW','ST'))
+                                  ('GK','CB','LB','RB','LWB','RWB','CDM','CM','CAM','LM','RM','LW','RW','ST'))
                            OR (slot_index BETWEEN 11 AND 15 AND position_code IS NULL)
                             ),
   -- Removing a player from jersey_signups frees their slot rather than

@@ -13,6 +13,8 @@ export type PositionCode =
   | 'CB'
   | 'LB'
   | 'RB'
+  | 'LWB'
+  | 'RWB'
   | 'CDM'
   | 'CM'
   | 'CAM'
@@ -107,16 +109,17 @@ export const FORMATIONS: Record<string, SlotSpec[]> = {
     { x: 50, y: 82, position_code: 'ST' },
     { x: 78, y: 80, position_code: 'RW' },
   ],
+  // Double pivot + CAM behind the strikers; wide defenders are wing-backs.
   '5-3-2': [
     { x: 50, y: 8,  position_code: 'GK' },
     { x: 30, y: 25, position_code: 'CB' },
     { x: 50, y: 22, position_code: 'CB' },
     { x: 70, y: 25, position_code: 'CB' },
-    { x: 12, y: 32, position_code: 'LB' },
-    { x: 88, y: 32, position_code: 'RB' },
-    { x: 32, y: 55, position_code: 'CM' },
-    { x: 50, y: 45, position_code: 'CDM' },
-    { x: 68, y: 55, position_code: 'CM' },
+    { x: 12, y: 32, position_code: 'LWB' },
+    { x: 88, y: 32, position_code: 'RWB' },
+    { x: 36, y: 48, position_code: 'CDM' },
+    { x: 50, y: 66, position_code: 'CAM' },
+    { x: 64, y: 48, position_code: 'CDM' },
     { x: 40, y: 82, position_code: 'ST' },
     { x: 60, y: 82, position_code: 'ST' },
   ],
