@@ -26,15 +26,17 @@ export default async function HomePage() {
   const signups = await getSignups()
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 pb-10 px-4">
+    <main className="min-h-screen bg-gradient-to-b from-praxis-black via-praxis-navy to-praxis-deep pb-10 px-4">
       <TopNav />
-      <div className="max-w-lg mx-auto pt-6">
+      <div className="max-w-lg mx-auto pt-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-black text-gray-900 tracking-tight">Praxis FC Roster</h1>
-          <p className="text-gray-500 mt-1 text-sm">Current jersey assignments</p>
+          <h1 className="font-display italic uppercase text-4xl text-white tracking-wide">
+            Roster
+          </h1>
+          <p className="text-slate-400 mt-2 text-sm">Current jersey assignments</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6">
+        <div className="bg-praxis-panel rounded-2xl border border-praxis-line p-5 sm:p-6 shadow-[0_0_60px_-15px_rgba(37,99,235,0.25)]">
           <PublicRoster initialSignups={signups} />
         </div>
       </div>

@@ -46,7 +46,7 @@ export default function AdminLockToggle() {
     return (
       <button
         onClick={lock}
-        className="text-xs font-bold text-emerald-700 hover:text-emerald-900 transition-colors border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 rounded-md px-2 py-1"
+        className="text-xs font-bold text-blue-300 hover:text-blue-200 transition-colors border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 rounded-md px-2 py-1"
         title="Lock admin mode"
       >
         Admin · Lock
@@ -58,14 +58,14 @@ export default function AdminLockToggle() {
     <>
       <button
         onClick={() => setPrompting(true)}
-        className="text-xs font-bold text-gray-400 hover:text-gray-700 transition-colors"
+        className="text-xs font-bold text-slate-500 hover:text-slate-200 transition-colors"
         title="Unlock admin mode"
       >
         Admin
       </button>
       {prompting && (
         <div
-          className="fixed inset-0 z-50 flex items-start justify-center bg-black/30 p-4 pt-24"
+          className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-4 pt-24"
           onClick={() => {
             setPrompting(false)
             setPw('')
@@ -73,10 +73,10 @@ export default function AdminLockToggle() {
           }}
         >
           <div
-            className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-5"
+            className="bg-praxis-panel border border-praxis-line rounded-2xl shadow-xl w-full max-w-sm p-5"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="text-sm font-bold text-gray-800 mb-3">Admin password</p>
+            <p className="text-sm font-bold text-white mb-3">Admin password</p>
             <input
               ref={inputRef}
               type="password"
@@ -85,10 +85,10 @@ export default function AdminLockToggle() {
               onKeyDown={(e) => {
                 if (e.key === 'Enter') submit()
               }}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+              className="w-full bg-praxis-black border border-praxis-line rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               autoComplete="current-password"
             />
-            {err && <p className="text-xs text-red-600 mt-2">{err}</p>}
+            {err && <p className="text-xs text-red-300 mt-2">{err}</p>}
             <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={() => {
@@ -96,14 +96,14 @@ export default function AdminLockToggle() {
                   setPw('')
                   setErr(null)
                 }}
-                className="text-xs text-gray-500 hover:text-gray-700 px-2 py-1"
+                className="text-xs text-slate-400 hover:text-slate-200 px-2 py-1"
               >
                 Cancel
               </button>
               <button
                 onClick={submit}
                 disabled={busy || pw.length === 0}
-                className="text-xs font-bold bg-blue-500 text-white rounded-md px-3 py-1.5 hover:bg-blue-600 disabled:opacity-40 transition-colors"
+                className="text-xs font-bold bg-blue-600 text-white rounded-md px-3 py-1.5 hover:bg-blue-500 disabled:opacity-40 transition-colors"
               >
                 Unlock
               </button>

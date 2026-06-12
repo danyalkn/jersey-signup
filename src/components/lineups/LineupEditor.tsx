@@ -88,14 +88,14 @@ export default function LineupEditor({ lineup, slots, subs, signups }: Props) {
   return (
     <div>
       <div className="mb-4">
-        <h2 className="text-xl font-black text-gray-900 tracking-tight">
+        <h2 className="font-display italic uppercase text-2xl text-white tracking-wide">
           {lineup.name}
         </h2>
-        <p className="text-xs text-gray-400 font-mono">{lineup.formation}</p>
+        <p className="text-xs text-slate-500 font-mono mt-0.5">{lineup.formation}</p>
       </div>
 
       {error && (
-        <div className="mb-3 px-3 py-2 bg-red-50 border border-red-200 rounded text-xs text-red-700">
+        <div className="mb-3 px-3 py-2 bg-red-500/10 border border-red-500/30 rounded text-xs text-red-300">
           {error}
         </div>
       )}
@@ -108,7 +108,7 @@ export default function LineupEditor({ lineup, slots, subs, signups }: Props) {
       />
 
       <div className="mt-5">
-        <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+        <p className="text-xs font-bold uppercase tracking-wider text-blue-400 mb-2">
           Subs
         </p>
         <div className="grid grid-cols-5 gap-2">
@@ -122,12 +122,12 @@ export default function LineupEditor({ lineup, slots, subs, signups }: Props) {
                 className={[
                   'rounded-lg border-2 px-2 py-3 text-center transition-colors',
                   player
-                    ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
-                    : 'bg-gray-50 border-dashed border-gray-300 text-gray-400',
+                    ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-300'
+                    : 'bg-white/5 border-dashed border-slate-700 text-slate-500',
                   isAdmin
                     ? player
-                      ? 'hover:bg-yellow-100 cursor-pointer'
-                      : 'hover:bg-gray-100 cursor-pointer'
+                      ? 'hover:bg-yellow-500/20 cursor-pointer'
+                      : 'hover:bg-white/10 cursor-pointer'
                     : 'cursor-default',
                 ].join(' ')}
               >

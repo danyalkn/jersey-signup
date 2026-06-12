@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Dark brand theme: native form controls (number spinners, autofill,
+   scrollbars) should render in their dark variants. */
+:root {
+  color-scheme: dark;
+}

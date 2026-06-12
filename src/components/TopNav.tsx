@@ -22,30 +22,44 @@ export default function TopNav() {
     : PUBLIC_TABS
 
   return (
-    <nav className="max-w-5xl mx-auto px-4 pt-6 flex items-center justify-between gap-4">
-      <ul className="flex items-center gap-6 text-sm font-black tracking-tight">
-        {tabs.map((tab) => {
-          const active =
-            tab.href === '/'
-              ? pathname === '/'
-              : pathname === tab.href || pathname.startsWith(`${tab.href}/`)
-          return (
-            <li key={tab.href}>
-              <Link
-                href={tab.href}
-                className={
-                  active
-                    ? 'text-gray-900 border-b-2 border-gray-900 pb-1'
-                    : 'text-gray-400 hover:text-gray-700 pb-1 border-b-2 border-transparent transition-colors'
-                }
-              >
-                {tab.label}
-              </Link>
-            </li>
-          )
-        })}
-      </ul>
-      <AdminLockToggle />
+    <nav className="max-w-5xl mx-auto px-4 pt-6">
+      <div className="flex items-center justify-between gap-4 pb-4 border-b border-praxis-line/60">
+        <div className="flex items-center gap-8">
+          {/* Wordmark — four stars over the club name, as on the crest */}
+          <Link href="/" className="select-none leading-none shrink-0">
+            <span className="block text-[8px] tracking-[0.4em] text-blue-400 text-center mb-1">
+              ★ ★ ★ ★
+            </span>
+            <span className="block font-display italic text-xl text-white tracking-wider">
+              PRAXIS FC
+            </span>
+          </Link>
+
+          <ul className="flex items-center gap-6 text-xs font-bold uppercase tracking-widest">
+            {tabs.map((tab) => {
+              const active =
+                tab.href === '/'
+                  ? pathname === '/'
+                  : pathname === tab.href || pathname.startsWith(`${tab.href}/`)
+              return (
+                <li key={tab.href}>
+                  <Link
+                    href={tab.href}
+                    className={
+                      active
+                        ? 'text-white border-b-2 border-blue-500 pb-1'
+                        : 'text-slate-500 hover:text-slate-200 pb-1 border-b-2 border-transparent transition-colors'
+                    }
+                  >
+                    {tab.label}
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+        <AdminLockToggle />
+      </div>
     </nav>
   )
 }

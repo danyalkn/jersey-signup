@@ -7,10 +7,10 @@ import AddPlayerModal from './AddPlayerModal'
 import EditModal from './EditModal'
 
 const SIZE_COLORS: Record<string, string> = {
-  S: 'bg-blue-100 text-blue-700',
-  M: 'bg-green-100 text-green-700',
-  L: 'bg-yellow-100 text-yellow-700',
-  XL: 'bg-orange-100 text-orange-700',
+  S: 'bg-sky-500/15 text-sky-300',
+  M: 'bg-green-500/15 text-green-300',
+  L: 'bg-yellow-500/15 text-yellow-300',
+  XL: 'bg-orange-500/15 text-orange-300',
 }
 
 interface AdminTableProps {
@@ -165,7 +165,7 @@ export default function AdminTable({ signups: initialSignups }: AdminTableProps)
   return (
     <>
       {error && (
-        <div className="mb-3 px-3 py-2 bg-red-50 border border-red-200 rounded text-xs text-red-700">
+        <div className="mb-3 px-3 py-2 bg-red-500/10 border border-red-500/30 rounded text-xs text-red-300">
           {error}
         </div>
       )}
@@ -177,7 +177,7 @@ export default function AdminTable({ signups: initialSignups }: AdminTableProps)
               setAdding(true)
               setError(null)
             }}
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-500 transition-colors"
           >
             <span className="text-base leading-none">+</span> Add Player
           </button>
@@ -186,8 +186,8 @@ export default function AdminTable({ signups: initialSignups }: AdminTableProps)
           onClick={copyCsv}
           className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all ${
             csvCopied
-              ? 'bg-green-100 text-green-700'
-              : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+              ? 'bg-green-500/15 text-green-300'
+              : 'bg-white/5 border border-praxis-line text-slate-200 hover:bg-white/10'
           }`}
         >
           {csvCopied ? (
@@ -208,7 +208,7 @@ export default function AdminTable({ signups: initialSignups }: AdminTableProps)
         </button>
         <button
           onClick={downloadCsv}
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-500 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
@@ -218,14 +218,14 @@ export default function AdminTable({ signups: initialSignups }: AdminTableProps)
       </div>
 
       {signups.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 py-16 text-center text-gray-400">
+        <div className="bg-praxis-panel rounded-2xl border border-praxis-line py-16 text-center text-slate-500">
           <p className="font-medium">No jerseys claimed yet</p>
         </div>
       ) : (
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-praxis-panel rounded-2xl border border-praxis-line overflow-hidden shadow-[0_0_60px_-15px_rgba(37,99,235,0.25)]">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+            <tr className="bg-blue-600 text-xs font-bold text-white uppercase tracking-wider">
               <th className="px-5 py-3 text-left w-16">#</th>
               <th className="px-5 py-3 text-left">Player</th>
               <th className="px-5 py-3 text-left">Email</th>
@@ -234,30 +234,30 @@ export default function AdminTable({ signups: initialSignups }: AdminTableProps)
               {isAdmin && <th className="px-5 py-3 text-right w-24">Actions</th>}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-white/5">
             {[...signups]
               .sort((a, b) => a.jersey_number - b.jersey_number)
               .map((s) => {
                 const pending = confirmDeleteId === s.id
                 return (
-                  <tr key={s.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={s.id} className="hover:bg-white/5 transition-colors">
                     <td className="px-5 py-3.5">
-                      <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 text-gray-800 font-black text-base">
+                      <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/10 text-white font-black text-base">
                         {s.jersey_number}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 font-medium text-gray-900">
+                    <td className="px-5 py-3.5 font-medium text-slate-200">
                       {s.player_name}
                     </td>
-                    <td className="px-5 py-3.5 text-gray-600 text-xs">
+                    <td className="px-5 py-3.5 text-xs">
                       {s.email ? (
                         <button
                           onClick={() => copyEmail(s)}
                           title={copiedRow === s.id ? 'Copied!' : 'Click to copy'}
                           className={`inline-flex items-center gap-1.5 break-all transition-colors ${
                             copiedRow === s.id
-                              ? 'text-green-600'
-                              : 'text-gray-600 hover:text-blue-600'
+                              ? 'text-green-300'
+                              : 'text-slate-400 hover:text-blue-300'
                           }`}
                         >
                           <span>{s.email}</span>
@@ -272,13 +272,13 @@ export default function AdminTable({ signups: initialSignups }: AdminTableProps)
                           )}
                         </button>
                       ) : (
-                        <span className="text-gray-300">—</span>
+                        <span className="text-slate-600">—</span>
                       )}
                     </td>
                     <td className="px-5 py-3.5">
                       <span
                         className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold ${
-                          SIZE_COLORS[s.size] ?? 'bg-gray-100 text-gray-600'
+                          SIZE_COLORS[s.size] ?? 'bg-white/10 text-slate-300'
                         }`}
                       >
                         {s.size}
@@ -298,7 +298,7 @@ export default function AdminTable({ signups: initialSignups }: AdminTableProps)
                         className={`inline-flex items-center justify-center w-6 h-6 rounded-md border-2 transition-all disabled:cursor-not-allowed ${
                           s.notified
                             ? 'bg-green-500 border-green-500 text-white'
-                            : 'bg-white border-gray-300 hover:border-green-400'
+                            : 'bg-transparent border-slate-600 hover:border-green-400'
                         } ${!isAdmin ? 'opacity-60' : ''}`}
                       >
                         {s.notified && (
@@ -315,13 +315,13 @@ export default function AdminTable({ signups: initialSignups }: AdminTableProps)
                             <button
                               onClick={() => handleDelete(s.id)}
                               disabled={busy}
-                              className="text-xs font-bold text-red-600 hover:text-red-700 px-1.5 py-0.5"
+                              className="text-xs font-bold text-red-400 hover:text-red-300 px-1.5 py-0.5"
                             >
                               Delete
                             </button>
                             <button
                               onClick={() => setConfirmDeleteId(null)}
-                              className="text-xs text-gray-400 hover:text-gray-600 px-1 py-0.5"
+                              className="text-xs text-slate-500 hover:text-slate-300 px-1 py-0.5"
                             >
                               Cancel
                             </button>
@@ -333,7 +333,7 @@ export default function AdminTable({ signups: initialSignups }: AdminTableProps)
                                 setEditing(s)
                                 setError(null)
                               }}
-                              className="text-gray-300 hover:text-blue-500 transition-colors"
+                              className="text-slate-600 hover:text-blue-400 transition-colors"
                               title={`Edit ${s.player_name}`}
                               aria-label={`Edit ${s.player_name}`}
                             >
@@ -343,7 +343,7 @@ export default function AdminTable({ signups: initialSignups }: AdminTableProps)
                             </button>
                             <button
                               onClick={() => setConfirmDeleteId(s.id)}
-                              className="text-gray-300 hover:text-red-500 transition-colors"
+                              className="text-slate-600 hover:text-red-400 transition-colors"
                               title={`Delete ${s.player_name}`}
                               aria-label={`Delete ${s.player_name}`}
                             >

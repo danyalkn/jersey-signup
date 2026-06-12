@@ -41,7 +41,7 @@ export default function PitchSVG({
   const startersByIndex = new Map(starters.map((s) => [s.slot_index, s]))
 
   return (
-    <div className="rounded-xl overflow-hidden border border-emerald-200 bg-emerald-50">
+    <div className="rounded-xl overflow-hidden border border-praxis-line bg-praxis-black/40">
       <svg
         viewBox="0 0 100 150"
         className="w-full block"
@@ -53,8 +53,8 @@ export default function PitchSVG({
           y={PAD_Y}
           width={PITCH_W}
           height={PITCH_H}
-          fill="#86efac"
-          stroke="#16a34a"
+          fill="#0D4A28"
+          stroke="#1E9E55"
           strokeWidth={0.4}
         />
         {/* Halfway line */}
@@ -63,7 +63,7 @@ export default function PitchSVG({
           y1={PAD_Y + PITCH_H / 2}
           x2={PAD_X + PITCH_W}
           y2={PAD_Y + PITCH_H / 2}
-          stroke="#16a34a"
+          stroke="#1E9E55"
           strokeWidth={0.4}
         />
         {/* Center circle + spot */}
@@ -72,14 +72,14 @@ export default function PitchSVG({
           cy={PAD_Y + PITCH_H / 2}
           r={9}
           fill="none"
-          stroke="#16a34a"
+          stroke="#1E9E55"
           strokeWidth={0.4}
         />
         <circle
           cx={PAD_X + PITCH_W / 2}
           cy={PAD_Y + PITCH_H / 2}
           r={0.6}
-          fill="#16a34a"
+          fill="#1E9E55"
         />
         {/* Penalty boxes — centered on pitch */}
         <rect
@@ -88,7 +88,7 @@ export default function PitchSVG({
           width={50}
           height={16}
           fill="none"
-          stroke="#16a34a"
+          stroke="#1E9E55"
           strokeWidth={0.4}
         />
         <rect
@@ -97,7 +97,7 @@ export default function PitchSVG({
           width={50}
           height={16}
           fill="none"
-          stroke="#16a34a"
+          stroke="#1E9E55"
           strokeWidth={0.4}
         />
         {/* Six-yard boxes — centered on pitch */}
@@ -107,7 +107,7 @@ export default function PitchSVG({
           width={24}
           height={6}
           fill="none"
-          stroke="#16a34a"
+          stroke="#1E9E55"
           strokeWidth={0.4}
         />
         <rect
@@ -116,7 +116,7 @@ export default function PitchSVG({
           width={24}
           height={6}
           fill="none"
-          stroke="#16a34a"
+          stroke="#1E9E55"
           strokeWidth={0.4}
         />
 
@@ -138,8 +138,8 @@ export default function PitchSVG({
                 cx={cx}
                 cy={cy}
                 r={RADIUS}
-                fill={filled ? '#1d4ed8' : 'white'}
-                stroke={filled ? '#1e40af' : '#94a3b8'}
+                fill={filled ? '#2563EB' : '#0E1A30'}
+                stroke={filled ? '#93C5FD' : '#94a3b8'}
                 strokeWidth={0.6}
                 strokeDasharray={filled ? undefined : '1.5,1'}
               />
@@ -163,7 +163,7 @@ export default function PitchSVG({
                     textAnchor="middle"
                     fontSize="3"
                     fontWeight="700"
-                    fill="#1f2937"
+                    fill="#E2E8F0"
                     pointerEvents="none"
                   >
                     {truncate(lastName(player!.player_name), NAME_TRUNCATE)}
@@ -177,7 +177,7 @@ export default function PitchSVG({
                   dominantBaseline="central"
                   fontSize="3"
                   fontWeight="700"
-                  fill="#475569"
+                  fill="#CBD5E1"
                   pointerEvents="none"
                 >
                   {label}

@@ -86,18 +86,18 @@ export default function PlannedSubs({
 
   return (
     <div>
-      <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+      <p className="text-xs font-bold uppercase tracking-wider text-blue-400 mb-2">
         Planned subs
       </p>
 
       {error && (
-        <div className="mb-2 px-3 py-1.5 bg-red-50 border border-red-200 rounded text-xs text-red-700">
+        <div className="mb-2 px-3 py-1.5 bg-red-500/10 border border-red-500/30 rounded text-xs text-red-300">
           {error}
         </div>
       )}
 
       {filledBench.length === 0 ? (
-        <p className="text-xs text-gray-400 italic">
+        <p className="text-xs text-slate-500 italic">
           {isAdmin
             ? 'Assign subs first to plan substitutions.'
             : 'No subs assigned yet.'}
@@ -114,24 +114,24 @@ export default function PlannedSubs({
 
             return (
               <li key={slot.id} className="flex items-center gap-2 flex-wrap">
-                <span className="inline-flex items-center gap-1.5 text-sm font-bold text-gray-800">
-                  <span className="text-yellow-700 bg-yellow-50 border border-yellow-200 rounded px-1.5 py-0.5 text-xs">
+                <span className="inline-flex items-center gap-1.5 text-sm font-bold text-white">
+                  <span className="text-yellow-300 bg-yellow-500/10 border border-yellow-500/30 rounded px-1.5 py-0.5 text-xs">
                     #{player.jersey_number}
                   </span>
                   {player.player_name}
                 </span>
-                <span className="text-xs text-gray-400">→ covers:</span>
+                <span className="text-xs text-slate-500">→ covers:</span>
 
                 {links.length === 0 && !menuOpen && isAdmin && (
                   <button
                     onClick={() => setOpenFor(player.id)}
-                    className="text-xs text-gray-400 hover:text-blue-500 italic"
+                    className="text-xs text-slate-500 hover:text-blue-300 italic"
                   >
                     + Add a player they cover
                   </button>
                 )}
                 {links.length === 0 && !isAdmin && (
-                  <span className="text-xs text-gray-300 italic">
+                  <span className="text-xs text-slate-600 italic">
                     nobody yet
                   </span>
                 )}
@@ -142,14 +142,14 @@ export default function PlannedSubs({
                   return (
                     <span
                       key={link.id}
-                      className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full pl-2 pr-1 py-0.5 text-xs font-bold"
+                      className="inline-flex items-center gap-1 bg-blue-500/10 text-blue-300 border border-blue-500/40 rounded-full pl-2 pr-1 py-0.5 text-xs font-bold"
                     >
                       #{starter.jersey_number} {starter.player_name}
                       {isAdmin && (
                         <button
                           onClick={() => handleRemove(link.id)}
                           disabled={busy}
-                          className="text-blue-400 hover:text-blue-600 ml-0.5 leading-none px-1"
+                          className="text-blue-400 hover:text-blue-200 ml-0.5 leading-none px-1"
                           aria-label="Remove link"
                         >
                           ×
@@ -165,7 +165,7 @@ export default function PlannedSubs({
                   availableStarters.length > 0 && (
                     <button
                       onClick={() => setOpenFor(player.id)}
-                      className="text-xs font-bold text-blue-500 hover:text-blue-600 px-1.5 py-0.5"
+                      className="text-xs font-bold text-blue-400 hover:text-blue-300 px-1.5 py-0.5"
                     >
                       + Add
                     </button>
@@ -174,7 +174,7 @@ export default function PlannedSubs({
                 {isAdmin && menuOpen && (
                   <div className="inline-flex items-center gap-1 flex-wrap">
                     {availableStarters.length === 0 ? (
-                      <span className="text-xs text-gray-400 italic">
+                      <span className="text-xs text-slate-500 italic">
                         No more starters to cover.
                       </span>
                     ) : (
@@ -183,7 +183,7 @@ export default function PlannedSubs({
                           key={sp.id}
                           onClick={() => handleAdd(player.id, sp.id)}
                           disabled={busy}
-                          className="text-xs font-bold text-blue-700 hover:bg-blue-100 bg-white border border-blue-200 rounded-full px-2 py-0.5"
+                          className="text-xs font-bold text-blue-300 hover:bg-blue-500/20 bg-white/5 border border-blue-500/30 rounded-full px-2 py-0.5"
                         >
                           #{sp.jersey_number} {sp.player_name}
                         </button>
@@ -191,7 +191,7 @@ export default function PlannedSubs({
                     )}
                     <button
                       onClick={() => setOpenFor(null)}
-                      className="text-xs text-gray-400 hover:text-gray-600 px-1.5 py-0.5"
+                      className="text-xs text-slate-500 hover:text-slate-300 px-1.5 py-0.5"
                     >
                       Cancel
                     </button>

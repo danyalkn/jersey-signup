@@ -26,13 +26,15 @@ export default async function AdminPage() {
   const signups = await getSignups()
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 pb-10 px-4">
+    <main className="min-h-screen bg-gradient-to-b from-praxis-black via-praxis-navy to-praxis-deep pb-10 px-4">
       <TopNav />
-      <div className="max-w-3xl mx-auto pt-6">
+      <div className="max-w-3xl mx-auto pt-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-black text-gray-900 tracking-tight">Roster</h1>
-          <p className="text-gray-500 mt-1 text-sm">
+          <h1 className="font-display italic uppercase text-4xl text-white tracking-wide">
+            Admin
+          </h1>
+          <p className="text-slate-400 mt-2 text-sm">
             {signups.length} jerseys claimed
           </p>
         </div>

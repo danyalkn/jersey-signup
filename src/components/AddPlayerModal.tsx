@@ -5,6 +5,10 @@ import { adminHeaders, useAdmin } from '@/lib/useAdmin'
 
 const SIZES = ['S', 'M', 'L', 'XL'] as const
 
+const INPUT_CLASSES = `w-full bg-praxis-black border border-praxis-line rounded-lg px-3 py-2.5 text-white
+  placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500
+  focus:border-transparent transition`
+
 interface AddPlayerModalProps {
   takenNumbers: Set<number>
   onClose: () => void
@@ -75,17 +79,17 @@ export default function AddPlayerModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+      <div className="bg-praxis-panel border border-praxis-line rounded-2xl shadow-2xl w-full max-w-sm p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-900">Add Player</h2>
+          <h2 className="text-xl font-bold text-white">Add Player</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors text-xl leading-none"
+            className="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 hover:text-slate-200 hover:bg-white/10 transition-colors text-xl leading-none"
             aria-label="Close"
           >
             ×
@@ -96,7 +100,7 @@ export default function AddPlayerModal({
           <div>
             <label
               htmlFor="add-name"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-slate-300 mb-1"
             >
               Player Name
             </label>
@@ -108,16 +112,14 @@ export default function AddPlayerModal({
               maxLength={100}
               required
               autoFocus
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-900
-                focus:outline-none focus:ring-2 focus:ring-blue-400
-                focus:border-transparent transition"
+              className={INPUT_CLASSES}
             />
           </div>
 
           <div>
             <label
               htmlFor="add-number"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-slate-300 mb-1"
             >
               Jersey Number
             </label>
@@ -129,18 +131,16 @@ export default function AddPlayerModal({
               value={jerseyNumber}
               onChange={(e) => setJerseyNumber(e.target.value)}
               required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-900
-                focus:outline-none focus:ring-2 focus:ring-blue-400
-                focus:border-transparent transition"
+              className={INPUT_CLASSES}
             />
           </div>
 
           <div>
             <label
               htmlFor="add-email"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-slate-300 mb-1"
             >
-              Email <span className="text-xs font-normal text-gray-400">(optional)</span>
+              Email <span className="text-xs font-normal text-slate-500">(optional)</span>
             </label>
             <input
               id="add-email"
@@ -149,14 +149,12 @@ export default function AddPlayerModal({
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               maxLength={255}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-900
-                placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400
-                focus:border-transparent transition"
+              className={INPUT_CLASSES}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-slate-300 mb-2">
               Jersey Size
             </label>
             <div className="grid grid-cols-4 gap-1.5">
@@ -167,8 +165,8 @@ export default function AddPlayerModal({
                   onClick={() => setSize(s)}
                   className={`py-2 rounded-lg text-sm font-semibold transition-colors ${
                     size === s
-                      ? 'bg-blue-500 text-white shadow-sm'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-white/5 text-slate-300 hover:bg-white/10'
                   }`}
                 >
                   {s}
@@ -180,8 +178,8 @@ export default function AddPlayerModal({
           <button
             type="submit"
             disabled={!jerseyNumber || !playerName.trim() || submitting}
-            className="w-full bg-blue-500 text-white rounded-lg py-3 font-semibold
-              hover:bg-blue-600 active:bg-blue-700
+            className="w-full bg-blue-600 text-white rounded-lg py-3 font-semibold
+              hover:bg-blue-500 active:bg-blue-700
               disabled:opacity-40 disabled:cursor-not-allowed
               transition-colors mt-2"
           >

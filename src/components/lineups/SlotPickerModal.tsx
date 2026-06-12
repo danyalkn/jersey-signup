@@ -52,29 +52,29 @@ export default function SlotPickerModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-black/30 p-4 pt-20"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 p-4 pt-20"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl w-full max-w-md p-5"
+        className="bg-praxis-panel border border-praxis-line rounded-2xl shadow-xl w-full max-w-md p-5"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-3">
           <div>
-            <p className="text-xs uppercase tracking-wider text-gray-400 font-bold">
+            <p className="text-xs uppercase tracking-wider text-blue-400 font-bold">
               {slotLabel}
             </p>
             {currentPlayer ? (
-              <p className="text-sm font-bold text-gray-800 mt-0.5">
+              <p className="text-sm font-bold text-white mt-0.5">
                 #{currentPlayer.jersey_number} {currentPlayer.player_name}
               </p>
             ) : (
-              <p className="text-sm text-gray-400 mt-0.5 italic">Empty</p>
+              <p className="text-sm text-slate-500 mt-0.5 italic">Empty</p>
             )}
           </div>
           <button
             onClick={onClose}
-            className="text-gray-300 hover:text-gray-500 text-lg leading-none p-1"
+            className="text-slate-500 hover:text-slate-200 text-lg leading-none p-1"
             aria-label="Close"
           >
             ×
@@ -84,7 +84,7 @@ export default function SlotPickerModal({
         {currentPlayer && (
           <button
             onClick={onClear}
-            className="w-full mb-3 px-3 py-2 text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+            className="w-full mb-3 px-3 py-2 text-sm font-bold text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-colors"
           >
             Clear slot
           </button>
@@ -96,12 +96,12 @@ export default function SlotPickerModal({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search players…"
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-2"
+          className="w-full bg-praxis-black border border-praxis-line rounded-lg px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-2"
         />
 
         <ul className="max-h-72 overflow-auto space-y-1">
           {filtered.length === 0 && (
-            <li className="text-xs text-gray-400 px-2 py-2">No players match.</li>
+            <li className="text-xs text-slate-500 px-2 py-2">No players match.</li>
           )}
           {filtered.map((s) => {
             const disabled = assignedPlayerIds.has(s.id)
@@ -112,17 +112,19 @@ export default function SlotPickerModal({
                   disabled={disabled}
                   className={[
                     'w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-left transition-colors',
-                    disabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-blue-50',
+                    disabled
+                      ? 'opacity-40 cursor-not-allowed'
+                      : 'hover:bg-blue-500/10',
                   ].join(' ')}
                 >
-                  <span className="font-black text-gray-700 w-7 text-center">
+                  <span className="font-black text-white w-7 text-center">
                     {s.jersey_number}
                   </span>
-                  <span className="font-medium text-gray-700 truncate">
+                  <span className="font-medium text-slate-200 truncate">
                     {s.player_name}
                   </span>
                   {disabled && (
-                    <span className="ml-auto text-xs text-gray-400">in lineup</span>
+                    <span className="ml-auto text-xs text-slate-500">in lineup</span>
                   )}
                 </button>
               </li>

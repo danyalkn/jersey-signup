@@ -16,6 +16,9 @@ type CreateState =
   | { kind: 'picking-formation'; query: string }
   | { kind: 'picking-name'; formation: string; name: string }
 
+const INPUT_CLASSES =
+  'w-full bg-praxis-black border border-praxis-line rounded-lg px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+
 export default function LineupSidebar({
   lineups,
   selectedLineupId,
@@ -130,13 +133,13 @@ export default function LineupSidebar({
   }
 
   return (
-    <aside className="border-b md:border-b-0 md:border-r border-gray-100 bg-gray-50/50 p-4">
+    <aside className="border-b md:border-b-0 md:border-r border-praxis-line bg-praxis-black/40 p-4">
       {isAdmin && (
         <div className="mb-3">
           {create.kind === 'idle' && (
             <button
               onClick={startCreate}
-              className="w-full px-3 py-2 text-sm font-bold bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              className="w-full px-3 py-2 text-sm font-bold bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors"
             >
               + Create Lineup
             </button>
@@ -154,11 +157,11 @@ export default function LineupSidebar({
                   if (e.key === 'Escape') cancelCreate()
                 }}
                 placeholder="Type to filter formations…"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                className={INPUT_CLASSES}
               />
               <ul className="space-y-1 max-h-48 overflow-auto">
                 {filteredFormations.length === 0 && (
-                  <li className="text-xs text-gray-400 px-2 py-1">
+                  <li className="text-xs text-slate-500 px-2 py-1">
                     No matching formation.
                   </li>
                 )}
@@ -166,7 +169,7 @@ export default function LineupSidebar({
                   <li key={f}>
                     <button
                       onClick={() => pickFormation(f)}
-                      className="w-full text-left px-2 py-1.5 rounded-md text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                      className="w-full text-left px-2 py-1.5 rounded-md text-sm font-bold text-slate-200 hover:bg-blue-500/10 hover:text-blue-300 transition-colors"
                     >
                       {f}
                     </button>
@@ -175,7 +178,7 @@ export default function LineupSidebar({
               </ul>
               <button
                 onClick={cancelCreate}
-                className="w-full text-xs text-gray-400 hover:text-gray-600"
+                className="w-full text-xs text-slate-500 hover:text-slate-300"
               >
                 Cancel
               </button>
@@ -183,8 +186,9 @@ export default function LineupSidebar({
           )}
           {create.kind === 'picking-name' && (
             <div className="space-y-2">
-              <p className="text-xs text-gray-500">
-                Formation: <span className="font-bold">{create.formation}</span>
+              <p className="text-xs text-slate-400">
+                Formation:{' '}
+                <span className="font-bold text-white">{create.formation}</span>
               </p>
               <input
                 autoFocus
@@ -203,19 +207,19 @@ export default function LineupSidebar({
                 }}
                 placeholder="Lineup name…"
                 maxLength={100}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                className={INPUT_CLASSES}
               />
               <div className="flex gap-2">
                 <button
                   onClick={submitCreate}
                   disabled={busy || create.name.trim().length === 0}
-                  className="flex-1 px-3 py-2 text-sm font-bold bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-40 transition-colors"
+                  className="flex-1 px-3 py-2 text-sm font-bold bg-blue-600 text-white rounded-lg hover:bg-blue-500 disabled:opacity-40 transition-colors"
                 >
                   Create
                 </button>
                 <button
                   onClick={cancelCreate}
-                  className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700"
+                  className="px-3 py-2 text-sm text-slate-400 hover:text-slate-200"
                 >
                   Cancel
                 </button>
@@ -226,12 +230,12 @@ export default function LineupSidebar({
       )}
 
       {error && (
-        <div className="text-xs text-red-600 px-1 mb-2">{error}</div>
+        <div className="text-xs text-red-300 px-1 mb-2">{error}</div>
       )}
 
       <ul className="space-y-1">
         {lineups.length === 0 && (
-          <li className="text-xs text-gray-400 px-2 py-2">No lineups yet.</li>
+          <li className="text-xs text-slate-500 px-2 py-2">No lineups yet.</li>
         )}
         {lineups.map((l) => {
           const active = l.id === selectedLineupId
@@ -244,8 +248,8 @@ export default function LineupSidebar({
               className={[
                 'group rounded-lg px-2.5 py-2 flex items-center gap-2 transition-colors',
                 active
-                  ? 'bg-blue-50 ring-1 ring-blue-200 cursor-pointer'
-                  : 'hover:bg-gray-100 cursor-pointer',
+                  ? 'bg-blue-500/10 ring-1 ring-blue-500/40 cursor-pointer'
+                  : 'hover:bg-white/5 cursor-pointer',
               ].join(' ')}
               onClick={() => !isRenaming && onSelect(l.id)}
             >
@@ -264,14 +268,14 @@ export default function LineupSidebar({
                       if (e.key === 'Escape') setRenaming(null)
                     }}
                     maxLength={100}
-                    className="w-full text-sm font-bold text-gray-800 border border-blue-300 rounded px-1.5 py-0.5 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                    className="w-full text-sm font-bold text-white bg-praxis-black border border-blue-500/40 rounded px-1.5 py-0.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 ) : (
-                  <div className="text-sm font-bold text-gray-800 truncate">
+                  <div className="text-sm font-bold text-white truncate">
                     {l.name}
                   </div>
                 )}
-                <div className="text-xs font-mono text-gray-400">{l.formation}</div>
+                <div className="text-xs font-mono text-slate-500">{l.formation}</div>
               </div>
 
               {isAdmin && !isRenaming && !pendingDelete && (
@@ -282,7 +286,7 @@ export default function LineupSidebar({
                       setRenaming({ id: l.id, value: l.name })
                       setError(null)
                     }}
-                    className="text-gray-300 hover:text-blue-500 transition-colors p-1"
+                    className="text-slate-600 hover:text-blue-400 transition-colors p-1"
                     title="Rename lineup"
                     aria-label={`Rename ${l.name}`}
                   >
@@ -305,7 +309,7 @@ export default function LineupSidebar({
                       e.stopPropagation()
                       setConfirmDelete(l.id)
                     }}
-                    className="text-gray-300 hover:text-red-500 transition-colors p-1"
+                    className="text-slate-600 hover:text-red-400 transition-colors p-1"
                     title="Delete lineup"
                     aria-label={`Delete ${l.name}`}
                   >
@@ -334,13 +338,13 @@ export default function LineupSidebar({
                   <button
                     onClick={submitRename}
                     disabled={busy || renaming!.value.trim().length === 0}
-                    className="text-xs font-bold text-blue-600 hover:text-blue-700 disabled:opacity-40 px-1.5 py-0.5"
+                    className="text-xs font-bold text-blue-400 hover:text-blue-300 disabled:opacity-40 px-1.5 py-0.5"
                   >
                     Save
                   </button>
                   <button
                     onClick={() => setRenaming(null)}
-                    className="text-xs text-gray-400 hover:text-gray-600 px-1 py-0.5"
+                    className="text-xs text-slate-500 hover:text-slate-300 px-1 py-0.5"
                   >
                     Cancel
                   </button>
@@ -355,13 +359,13 @@ export default function LineupSidebar({
                   <button
                     onClick={() => deleteLineup(l.id)}
                     disabled={busy}
-                    className="text-xs font-bold text-red-600 hover:text-red-700 px-1.5 py-0.5"
+                    className="text-xs font-bold text-red-400 hover:text-red-300 px-1.5 py-0.5"
                   >
                     Delete
                   </button>
                   <button
                     onClick={() => setConfirmDelete(null)}
-                    className="text-xs text-gray-400 hover:text-gray-600 px-1.5 py-0.5"
+                    className="text-xs text-slate-500 hover:text-slate-300 px-1.5 py-0.5"
                   >
                     Cancel
                   </button>

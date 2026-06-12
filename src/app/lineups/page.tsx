@@ -45,12 +45,14 @@ export default async function LineupsPage() {
   const { signups, lineups, slots, subs } = await getInitialData()
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 pb-10 px-4">
+    <main className="min-h-screen bg-gradient-to-b from-praxis-black via-praxis-navy to-praxis-deep pb-10 px-4">
       <TopNav />
-      <div className="max-w-5xl mx-auto pt-6">
+      <div className="max-w-5xl mx-auto pt-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-black text-gray-900 tracking-tight">Lineups</h1>
-          <p className="text-gray-500 mt-1 text-sm">Plan formations and sub coverage before the match</p>
+          <h1 className="font-display italic uppercase text-4xl text-white tracking-wide">
+            Lineups
+          </h1>
+          <p className="text-slate-400 mt-2 text-sm">Plan formations and sub coverage before the match</p>
         </div>
 
         <LineupsBoard

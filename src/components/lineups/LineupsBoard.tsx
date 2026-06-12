@@ -146,7 +146,7 @@ export default function LineupsBoard({
   )
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div className="bg-praxis-panel rounded-2xl border border-praxis-line overflow-hidden shadow-[0_0_60px_-15px_rgba(37,99,235,0.25)]">
       <div className="grid grid-cols-1 md:grid-cols-[16rem_1fr]">
         <LineupSidebar
           lineups={lineups}
@@ -162,7 +162,7 @@ export default function LineupsBoard({
               signups={signups}
             />
           ) : (
-            <div className="h-full flex items-center justify-center text-center text-gray-400 py-20">
+            <div className="h-full flex items-center justify-center text-center text-slate-500 py-20">
               <p className="text-sm">
                 {isAdmin
                   ? 'Select a lineup from the left, or create a new one.'

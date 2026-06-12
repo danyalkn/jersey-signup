@@ -7,10 +7,10 @@ import AddPlayerModal from './AddPlayerModal'
 import EditModal from './EditModal'
 
 const SIZE_COLORS: Record<string, string> = {
-  S: 'bg-blue-100 text-blue-700',
-  M: 'bg-green-100 text-green-700',
-  L: 'bg-yellow-100 text-yellow-700',
-  XL: 'bg-orange-100 text-orange-700',
+  S: 'bg-sky-500/15 text-sky-300',
+  M: 'bg-green-500/15 text-green-300',
+  L: 'bg-yellow-500/15 text-yellow-300',
+  XL: 'bg-orange-500/15 text-orange-300',
 }
 
 interface Props {
@@ -96,12 +96,12 @@ export default function PublicRoster({ initialSignups }: Props) {
       {error && (
         <div
           role="alert"
-          className="mb-4 flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+          className="mb-4 flex items-start gap-3 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-300 text-sm"
         >
           <span className="flex-1">{error}</span>
           <button
             onClick={() => setError(null)}
-            className="text-red-400 hover:text-red-600 font-bold text-base leading-none"
+            className="text-red-400 hover:text-red-200 font-bold text-base leading-none"
             aria-label="Dismiss"
           >
             ×
@@ -116,7 +116,7 @@ export default function PublicRoster({ initialSignups }: Props) {
               setAdding(true)
               setError(null)
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 text-white rounded-lg text-xs font-bold hover:bg-blue-600 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-500 transition-colors"
           >
             <span className="text-base leading-none">+</span> Add Player
           </button>
@@ -124,28 +124,32 @@ export default function PublicRoster({ initialSignups }: Props) {
       )}
 
       {sorted.length === 0 ? (
-        <p className="text-sm text-gray-400 py-8 text-center">
+        <p className="text-sm text-slate-500 py-8 text-center">
           No jerseys claimed yet.
         </p>
       ) : (
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-              <th className="pb-2 text-center w-20">Jersey #</th>
-              <th className="pb-2 text-left">Player Name</th>
-              <th className="pb-2 text-right w-16">Size</th>
-              {isAdmin && <th className="pb-2 w-20"></th>}
+            <tr className="bg-blue-600 text-white text-xs font-bold uppercase tracking-wider">
+              <th className="py-2 px-2 text-center w-20 rounded-l-md">#</th>
+              <th className="py-2 px-2 text-left">Player</th>
+              <th
+                className={`py-2 px-2 text-right w-16 ${isAdmin ? '' : 'rounded-r-md'}`}
+              >
+                Size
+              </th>
+              {isAdmin && <th className="py-2 px-2 w-20 rounded-r-md"></th>}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-white/5">
             {sorted.map((s) => {
               const pending = confirmDeleteId === s.id
               return (
                 <tr key={s.id}>
-                  <td className="py-2.5 font-black text-gray-800 text-center">
+                  <td className="py-2.5 font-black text-white text-center">
                     {s.jersey_number}
                   </td>
-                  <td className="py-2.5 font-medium text-gray-700">
+                  <td className="py-2.5 px-2 font-medium text-slate-200">
                     <span className="inline-flex items-center gap-1.5">
                       {s.player_name}
                       {s.email && (
@@ -154,8 +158,8 @@ export default function PublicRoster({ initialSignups }: Props) {
                           title={copiedId === s.id ? 'Copied!' : `Copy ${s.email}`}
                           className={`inline-flex items-center justify-center w-5 h-5 rounded-md transition-all ${
                             copiedId === s.id
-                              ? 'bg-green-100 text-green-600 scale-110'
-                              : 'text-gray-300 hover:text-blue-500 hover:bg-blue-50'
+                              ? 'bg-green-500/20 text-green-300 scale-110'
+                              : 'text-slate-600 hover:text-blue-400 hover:bg-blue-500/10'
                           }`}
                         >
                           {copiedId === s.id ? (
@@ -191,29 +195,29 @@ export default function PublicRoster({ initialSignups }: Props) {
                       )}
                     </span>
                   </td>
-                  <td className="py-2.5 text-right">
+                  <td className="py-2.5 px-2 text-right">
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold ${
-                        SIZE_COLORS[s.size] ?? 'bg-gray-100 text-gray-600'
+                        SIZE_COLORS[s.size] ?? 'bg-white/10 text-slate-300'
                       }`}
                     >
                       {s.size}
                     </span>
                   </td>
                   {isAdmin && (
-                    <td className="py-2.5 text-right">
+                    <td className="py-2.5 px-2 text-right">
                       {pending ? (
                         <span className="inline-flex items-center gap-1">
                           <button
                             onClick={() => handleDelete(s.id)}
                             disabled={busy}
-                            className="text-xs font-bold text-red-600 hover:text-red-700 px-1.5 py-0.5"
+                            className="text-xs font-bold text-red-400 hover:text-red-300 px-1.5 py-0.5"
                           >
                             Delete
                           </button>
                           <button
                             onClick={() => setConfirmDeleteId(null)}
-                            className="text-xs text-gray-400 hover:text-gray-600 px-1 py-0.5"
+                            className="text-xs text-slate-500 hover:text-slate-300 px-1 py-0.5"
                           >
                             Cancel
                           </button>
@@ -225,7 +229,7 @@ export default function PublicRoster({ initialSignups }: Props) {
                               setEditing(s)
                               setError(null)
                             }}
-                            className="text-gray-300 hover:text-blue-500 transition-colors"
+                            className="text-slate-600 hover:text-blue-400 transition-colors"
                             title={`Edit ${s.player_name}`}
                             aria-label={`Edit ${s.player_name}`}
                           >
@@ -245,7 +249,7 @@ export default function PublicRoster({ initialSignups }: Props) {
                           </button>
                           <button
                             onClick={() => setConfirmDeleteId(s.id)}
-                            className="text-gray-300 hover:text-red-500 transition-colors"
+                            className="text-slate-600 hover:text-red-400 transition-colors"
                             title={`Delete ${s.player_name}`}
                             aria-label={`Delete ${s.player_name}`}
                           >
