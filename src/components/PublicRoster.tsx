@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { adminHeaders, useAdmin } from '@/lib/useAdmin'
 import { supabase, type JerseySignup } from '@/lib/supabase'
+import AddPlayerModal from './AddPlayerModal'
 import EditModal from './EditModal'
 
 const SIZE_COLORS: Record<string, string> = {
@@ -20,6 +21,7 @@ export default function PublicRoster({ initialSignups }: Props) {
   const { isAdmin, password } = useAdmin()
   const [signups, setSignups] = useState<JerseySignup[]>(initialSignups)
   const [editing, setEditing] = useState<JerseySignup | null>(null)
+  const [adding, setAdding] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -103,6 +105,20 @@ export default function PublicRoster({ initialSignups }: Props) {
             aria-label="Dismiss"
           >
             ×
+          </button>
+        </div>
+      )}
+
+      {isAdmin && (
+        <div className="flex justify-end mb-3">
+          <button
+            onClick={() => {
+              setAdding(true)
+              setError(null)
+            }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 text-white rounded-lg text-xs font-bold hover:bg-blue-600 transition-colors"
+          >
+            <span className="text-base leading-none">+</span> Add Player
           </button>
         </div>
       )}
@@ -267,6 +283,18 @@ export default function PublicRoster({ initialSignups }: Props) {
           onError={(message) => {
             setError(message)
             setEditing(null)
+          }}
+        />
+      )}
+
+      {adding && (
+        <AddPlayerModal
+          takenNumbers={takenNumbers}
+          onClose={() => setAdding(false)}
+          onSuccess={() => setAdding(false)}
+          onError={(message) => {
+            setError(message)
+            setAdding(false)
           }}
         />
       )}

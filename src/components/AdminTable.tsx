@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { adminHeaders, useAdmin } from '@/lib/useAdmin'
 import { supabase, type JerseySignup } from '@/lib/supabase'
+import AddPlayerModal from './AddPlayerModal'
 import EditModal from './EditModal'
 
 const SIZE_COLORS: Record<string, string> = {
@@ -43,6 +44,7 @@ export default function AdminTable({ signups: initialSignups }: AdminTableProps)
   const [csvCopied, setCsvCopied] = useState(false)
   const [pendingId, setPendingId] = useState<string | null>(null)
   const [editing, setEditing] = useState<JerseySignup | null>(null)
+  const [adding, setAdding] = useState(false)
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -160,14 +162,6 @@ export default function AdminTable({ signups: initialSignups }: AdminTableProps)
 
   const takenNumbers = new Set(signups.map((s) => s.jersey_number))
 
-  if (signups.length === 0) {
-    return (
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 py-16 text-center text-gray-400">
-        <p className="font-medium">No jerseys claimed yet</p>
-      </div>
-    )
-  }
-
   return (
     <>
       {error && (
@@ -177,6 +171,17 @@ export default function AdminTable({ signups: initialSignups }: AdminTableProps)
       )}
 
       <div className="flex gap-2 mb-4 justify-end">
+        {isAdmin && (
+          <button
+            onClick={() => {
+              setAdding(true)
+              setError(null)
+            }}
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+          >
+            <span className="text-base leading-none">+</span> Add Player
+          </button>
+        )}
         <button
           onClick={copyCsv}
           className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all ${
@@ -212,6 +217,11 @@ export default function AdminTable({ signups: initialSignups }: AdminTableProps)
         </button>
       </div>
 
+      {signups.length === 0 ? (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 py-16 text-center text-gray-400">
+          <p className="font-medium">No jerseys claimed yet</p>
+        </div>
+      ) : (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
@@ -351,6 +361,7 @@ export default function AdminTable({ signups: initialSignups }: AdminTableProps)
           </tbody>
         </table>
       </div>
+      )}
 
       {editing && (
         <EditModal
@@ -361,6 +372,18 @@ export default function AdminTable({ signups: initialSignups }: AdminTableProps)
           onError={(message) => {
             setError(message)
             setEditing(null)
+          }}
+        />
+      )}
+
+      {adding && (
+        <AddPlayerModal
+          takenNumbers={takenNumbers}
+          onClose={() => setAdding(false)}
+          onSuccess={() => setAdding(false)}
+          onError={(message) => {
+            setError(message)
+            setAdding(false)
           }}
         />
       )}
