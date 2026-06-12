@@ -120,8 +120,8 @@ export const FORMATIONS: Record<string, SlotSpec[]> = {
     { x: 36, y: 48, position_code: 'CDM' },
     { x: 50, y: 66, position_code: 'CAM' },
     { x: 64, y: 48, position_code: 'CDM' },
-    { x: 40, y: 82, position_code: 'ST' },
-    { x: 60, y: 82, position_code: 'ST' },
+    { x: 35, y: 82, position_code: 'ST' },
+    { x: 65, y: 82, position_code: 'ST' },
   ],
   '4-4-1-1': [
     { x: 50, y: 8,  position_code: 'GK' },

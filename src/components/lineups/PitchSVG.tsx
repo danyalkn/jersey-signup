@@ -127,7 +127,9 @@ export default function PitchSVG({
           const cy = projectY(spec.y)
           const player = slot.player_id ? playerById.get(slot.player_id) : null
           const filled = !!player
-          const label = slot.position_code ?? spec.position_code
+          // The static formation config is the display source of truth —
+          // stored position_code can lag behind config renames.
+          const label = spec.position_code
           return (
             <g
               key={slot.id}

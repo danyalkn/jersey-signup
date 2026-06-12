@@ -162,6 +162,10 @@ export default function LineupEditor({ lineup, slots, subs, signups }: Props) {
       {activeSlot && (
         <SlotPickerModal
           slot={activeSlot}
+          positionLabel={
+            formationSpec[activeSlot.slot_index]?.position_code ??
+            activeSlot.position_code
+          }
           signups={signups}
           assignedPlayerIds={assignedPlayerIds}
           currentPlayerId={activeSlot.player_id}

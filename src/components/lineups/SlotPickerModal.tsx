@@ -5,6 +5,9 @@ import type { JerseySignup, LineupSlot } from '@/lib/supabase'
 
 interface Props {
   slot: LineupSlot
+  // Label from the formation config (display source of truth — the stored
+  // slot.position_code can lag behind config renames).
+  positionLabel: string | null
   signups: JerseySignup[]
   assignedPlayerIds: Set<string>
   currentPlayerId: string | null
@@ -16,6 +19,7 @@ interface Props {
 
 export default function SlotPickerModal({
   slot,
+  positionLabel,
   signups,
   assignedPlayerIds,
   currentPlayerId,
@@ -47,7 +51,7 @@ export default function SlotPickerModal({
   const currentPlayer = currentPlayerId ? playerById.get(currentPlayerId) : null
   const slotLabel =
     slot.slot_index <= 10
-      ? `Starter slot · ${slot.position_code ?? ''}`
+      ? `Starter slot · ${positionLabel ?? slot.position_code ?? ''}`
       : `Sub slot ${slot.slot_index - 10}`
 
   return (
