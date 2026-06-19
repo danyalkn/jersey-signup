@@ -136,6 +136,20 @@ export const FORMATIONS: Record<string, SlotSpec[]> = {
     { x: 50, y: 70, position_code: 'CAM' },
     { x: 50, y: 86, position_code: 'ST' },
   ],
+  // Narrow midfield diamond: holding CDM, two box-to-box CMs, a CAM at the tip.
+  '4-1-2-1-2': [
+    { x: 50, y: 8,  position_code: 'GK' },
+    { x: 18, y: 25, position_code: 'LB' },
+    { x: 40, y: 22, position_code: 'CB' },
+    { x: 60, y: 22, position_code: 'CB' },
+    { x: 82, y: 25, position_code: 'RB' },
+    { x: 50, y: 40, position_code: 'CDM' },
+    { x: 28, y: 54, position_code: 'CM' },
+    { x: 72, y: 54, position_code: 'CM' },
+    { x: 50, y: 67, position_code: 'CAM' },
+    { x: 38, y: 84, position_code: 'ST' },
+    { x: 62, y: 84, position_code: 'ST' },
+  ],
 }
 
 export const FORMATION_NAMES = Object.keys(FORMATIONS)
