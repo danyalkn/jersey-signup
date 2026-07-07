@@ -2,148 +2,50 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useAdmin } from '@/lib/useAdmin'
+import { LINEUP_PLAYERS } from '@/lib/roster'
 import {
-  supabase,
-  type JerseySignup,
+  slotsOf,
+  subsOf,
+  toLineupMeta,
+  useStoredLineups,
   type Lineup,
-  type LineupSlot,
-  type LineupSub,
-} from '@/lib/supabase'
+} from '@/lib/lineupStore'
 import LineupSidebar from './LineupSidebar'
 import LineupEditor from './LineupEditor'
 
-interface Props {
-  initialSignups: JerseySignup[]
-  initialLineups: Lineup[]
-  initialSlots: LineupSlot[]
-  initialSubs: LineupSub[]
+function byUpdatedDesc(a: Lineup, b: Lineup) {
+  return b.updated_at.localeCompare(a.updated_at)
 }
 
-function sortLineups(lineups: Lineup[]): Lineup[] {
-  return [...lineups].sort((a, b) => b.updated_at.localeCompare(a.updated_at))
-}
-
-export default function LineupsBoard({
-  initialSignups,
-  initialLineups,
-  initialSlots,
-  initialSubs,
-}: Props) {
+export default function LineupsBoard() {
   const { isAdmin } = useAdmin()
-  const [signups, setSignups] = useState<JerseySignup[]>(initialSignups)
-  const [lineups, setLineups] = useState<Lineup[]>(sortLineups(initialLineups))
-  const [slots, setSlots] = useState<LineupSlot[]>(initialSlots)
-  const [subs, setSubs] = useState<LineupSub[]>(initialSubs)
-  const [selectedLineupId, setSelectedLineupId] = useState<string | null>(
-    initialLineups[0]?.id ?? null
+  const stored = useStoredLineups()
+  const [selectedLineupId, setSelectedLineupId] = useState<string | null>(null)
+
+  const lineups = useMemo(
+    () => stored.map(toLineupMeta).sort(byUpdatedDesc),
+    [stored]
   )
 
+  // Select the most recent lineup once one is available, and recover if the
+  // current selection is deleted.
   useEffect(() => {
-    if (selectedLineupId === null && lineups.length > 0) {
-      setSelectedLineupId(lineups[0].id)
+    if (
+      selectedLineupId === null ||
+      !lineups.some((l) => l.id === selectedLineupId)
+    ) {
+      setSelectedLineupId(lineups[0]?.id ?? null)
     }
   }, [lineups, selectedLineupId])
 
-  useEffect(() => {
-    const channel = supabase
-      .channel('lineups_board_realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'jersey_signups' },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            const row = payload.new as JerseySignup
-            setSignups((prev) =>
-              prev.some((s) => s.id === row.id) ? prev : [...prev, row]
-            )
-          } else if (payload.eventType === 'UPDATE') {
-            const row = payload.new as JerseySignup
-            setSignups((prev) => prev.map((s) => (s.id === row.id ? row : s)))
-          } else if (payload.eventType === 'DELETE') {
-            const row = payload.old as JerseySignup
-            setSignups((prev) => prev.filter((s) => s.id !== row.id))
-          }
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'lineups' },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            const row = payload.new as Lineup
-            setLineups((prev) =>
-              prev.some((l) => l.id === row.id) ? prev : sortLineups([row, ...prev])
-            )
-          } else if (payload.eventType === 'UPDATE') {
-            const row = payload.new as Lineup
-            setLineups((prev) =>
-              sortLineups(prev.map((l) => (l.id === row.id ? row : l)))
-            )
-          } else if (payload.eventType === 'DELETE') {
-            const row = payload.old as Lineup
-            setLineups((prev) => prev.filter((l) => l.id !== row.id))
-            setSelectedLineupId((curr) => (curr === row.id ? null : curr))
-          }
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'lineup_slots' },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            const row = payload.new as LineupSlot
-            setSlots((prev) =>
-              prev.some((s) => s.id === row.id) ? prev : [...prev, row]
-            )
-          } else if (payload.eventType === 'UPDATE') {
-            const row = payload.new as LineupSlot
-            setSlots((prev) => prev.map((s) => (s.id === row.id ? row : s)))
-          } else if (payload.eventType === 'DELETE') {
-            const row = payload.old as LineupSlot
-            setSlots((prev) => prev.filter((s) => s.id !== row.id))
-          }
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'lineup_subs' },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            const row = payload.new as LineupSub
-            setSubs((prev) =>
-              prev.some((s) => s.id === row.id) ? prev : [...prev, row]
-            )
-          } else if (payload.eventType === 'UPDATE') {
-            const row = payload.new as LineupSub
-            setSubs((prev) => prev.map((s) => (s.id === row.id ? row : s)))
-          } else if (payload.eventType === 'DELETE') {
-            const row = payload.old as LineupSub
-            setSubs((prev) => prev.filter((s) => s.id !== row.id))
-          }
-        }
-      )
-      .subscribe()
+  const selectedStored = useMemo(
+    () => stored.find((l) => l.id === selectedLineupId) ?? null,
+    [stored, selectedLineupId]
+  )
 
-    return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [])
-
-  const selectedLineup = useMemo(
-    () => lineups.find((l) => l.id === selectedLineupId) ?? null,
-    [lineups, selectedLineupId]
-  )
-  const selectedSlots = useMemo(
-    () =>
-      slots
-        .filter((s) => s.lineup_id === selectedLineupId)
-        .sort((a, b) => a.slot_index - b.slot_index),
-    [slots, selectedLineupId]
-  )
-  const selectedSubs = useMemo(
-    () => subs.filter((s) => s.lineup_id === selectedLineupId),
-    [subs, selectedLineupId]
-  )
+  const selectedLineup = selectedStored ? toLineupMeta(selectedStored) : null
+  const selectedSlots = selectedStored ? slotsOf(selectedStored) : []
+  const selectedSubs = selectedStored ? subsOf(selectedStored) : []
 
   return (
     <div className="bg-praxis-panel rounded-2xl border border-praxis-line overflow-hidden shadow-[0_0_60px_-15px_rgba(37,99,235,0.25)]">
@@ -159,7 +61,7 @@ export default function LineupsBoard({
               lineup={selectedLineup}
               slots={selectedSlots}
               subs={selectedSubs}
-              signups={signups}
+              players={LINEUP_PLAYERS}
             />
           ) : (
             <div className="h-full flex items-center justify-center text-center text-slate-500 py-20">

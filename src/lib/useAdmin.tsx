@@ -69,7 +69,3 @@ export function useAdmin(): AdminCtx {
   }
   return ctx
 }
-
-export function adminHeaders(password: string | null): Record<string, string> {
-  return password ? { 'x-admin-password': password } : {}
-}

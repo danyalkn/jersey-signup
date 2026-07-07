@@ -1,15 +1,21 @@
 'use client'
 
 import { useState } from 'react'
-import { adminHeaders, useAdmin } from '@/lib/useAdmin'
-import type { JerseySignup, LineupSlot, LineupSub } from '@/lib/supabase'
+import { useAdmin } from '@/lib/useAdmin'
+import { playerKeyFromId, type LineupPlayer } from '@/lib/roster'
+import {
+  addSubLink,
+  removeSubLink,
+  type LineupSlot,
+  type LineupSub,
+} from '@/lib/lineupStore'
 
 interface Props {
   lineupId: string
   starters: LineupSlot[]
   bench: LineupSlot[]
   subs: LineupSub[]
-  playerById: Map<string, JerseySignup>
+  playerById: Map<string, LineupPlayer>
 }
 
 export default function PlannedSubs({
@@ -19,69 +25,37 @@ export default function PlannedSubs({
   subs,
   playerById,
 }: Props) {
-  const { isAdmin, password } = useAdmin()
+  const { isAdmin } = useAdmin()
   // Bench-player id whose "+ Add" menu is currently open.
   const [openFor, setOpenFor] = useState<string | null>(null)
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   const filledBench = bench
     .filter((b) => b.player_id !== null)
     .map((b) => ({ slot: b, player: playerById.get(b.player_id!) }))
-    .filter((x): x is { slot: LineupSlot; player: JerseySignup } => !!x.player)
+    .filter((x): x is { slot: LineupSlot; player: LineupPlayer } => !!x.player)
     .sort((a, b) => a.slot.slot_index - b.slot.slot_index)
 
   const filledStarters = starters
     .filter((s) => s.player_id !== null)
     .map((s) => ({ slot: s, player: playerById.get(s.player_id!) }))
-    .filter((x): x is { slot: LineupSlot; player: JerseySignup } => !!x.player)
+    .filter((x): x is { slot: LineupSlot; player: LineupPlayer } => !!x.player)
     .sort((a, b) => a.slot.slot_index - b.slot.slot_index)
 
-  const handleAdd = async (bench_player_id: string, starter_player_id: string) => {
-    setBusy(true)
-    setError(null)
-    try {
-      const res = await fetch('/api/lineups/add-sub-link', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...adminHeaders(password),
-        },
-        body: JSON.stringify({
-          lineup_id: lineupId,
-          bench_player_id,
-          starter_player_id,
-        }),
-      })
-      const body = await res.json()
-      if (!res.ok) throw new Error(body.error ?? 'Failed')
-      setOpenFor(null)
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed')
-    } finally {
-      setBusy(false)
-    }
+  const handleAdd = (bench_player_id: string, starter_player_id: string) => {
+    addSubLink(
+      lineupId,
+      playerKeyFromId(bench_player_id),
+      playerKeyFromId(starter_player_id)
+    )
+    setOpenFor(null)
   }
 
-  const handleRemove = async (sub_id: string) => {
-    setBusy(true)
-    setError(null)
-    try {
-      const res = await fetch('/api/lineups/remove-sub-link', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...adminHeaders(password),
-        },
-        body: JSON.stringify({ sub_id }),
-      })
-      const body = await res.json()
-      if (!res.ok) throw new Error(body.error ?? 'Failed')
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed')
-    } finally {
-      setBusy(false)
-    }
+  const handleRemove = (bench_player_id: string, starter_player_id: string) => {
+    removeSubLink(
+      lineupId,
+      playerKeyFromId(bench_player_id),
+      playerKeyFromId(starter_player_id)
+    )
   }
 
   return (
@@ -89,12 +63,6 @@ export default function PlannedSubs({
       <p className="text-xs font-bold uppercase tracking-wider text-blue-400 mb-2">
         Planned subs
       </p>
-
-      {error && (
-        <div className="mb-2 px-3 py-1.5 bg-red-500/10 border border-red-500/30 rounded text-xs text-red-300">
-          {error}
-        </div>
-      )}
 
       {filledBench.length === 0 ? (
         <p className="text-xs text-slate-500 italic">
@@ -147,8 +115,12 @@ export default function PlannedSubs({
                       #{starter.jersey_number} {starter.player_name}
                       {isAdmin && (
                         <button
-                          onClick={() => handleRemove(link.id)}
-                          disabled={busy}
+                          onClick={() =>
+                            handleRemove(
+                              link.bench_player_id,
+                              link.starter_player_id
+                            )
+                          }
                           className="text-blue-400 hover:text-blue-200 ml-0.5 leading-none px-1"
                           aria-label="Remove link"
                         >
@@ -182,7 +154,6 @@ export default function PlannedSubs({
                         <button
                           key={sp.id}
                           onClick={() => handleAdd(player.id, sp.id)}
-                          disabled={busy}
                           className="text-xs font-bold text-blue-300 hover:bg-blue-500/20 bg-white/5 border border-blue-500/30 rounded-full px-2 py-0.5"
                         >
                           #{sp.jersey_number} {sp.player_name}

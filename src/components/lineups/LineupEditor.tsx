@@ -2,8 +2,14 @@
 
 import { useState } from 'react'
 import { FORMATIONS } from '@/lib/formations'
-import { adminHeaders, useAdmin } from '@/lib/useAdmin'
-import type { JerseySignup, Lineup, LineupSlot, LineupSub } from '@/lib/supabase'
+import { useAdmin } from '@/lib/useAdmin'
+import { playerKeyFromId, type LineupPlayer } from '@/lib/roster'
+import {
+  setSlotPlayer,
+  type Lineup,
+  type LineupSlot,
+  type LineupSub,
+} from '@/lib/lineupStore'
 import PitchSVG from './PitchSVG'
 import SlotPickerModal from './SlotPickerModal'
 import PlannedSubs from './PlannedSubs'
@@ -12,7 +18,7 @@ interface Props {
   lineup: Lineup
   slots: LineupSlot[]
   subs: LineupSub[]
-  signups: JerseySignup[]
+  players: LineupPlayer[]
 }
 
 function lastName(fullName: string): string {
@@ -20,16 +26,15 @@ function lastName(fullName: string): string {
   return parts.length > 1 ? parts[parts.length - 1] : fullName
 }
 
-export default function LineupEditor({ lineup, slots, subs, signups }: Props) {
-  const { isAdmin, password } = useAdmin()
+export default function LineupEditor({ lineup, slots, subs, players }: Props) {
+  const { isAdmin } = useAdmin()
   const [activeSlotId, setActiveSlotId] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
 
   const starters = slots.filter((s) => s.slot_index <= 10)
   const bench = slots.filter((s) => s.slot_index >= 11)
   const formationSpec = FORMATIONS[lineup.formation] ?? []
 
-  const playerById = new Map(signups.map((s) => [s.id, s]))
+  const playerById = new Map(players.map((s) => [s.id, s]))
   const assignedPlayerIds = new Set(
     slots
       .map((s) => s.player_id)
@@ -40,44 +45,16 @@ export default function LineupEditor({ lineup, slots, subs, signups }: Props) {
     ? slots.find((s) => s.id === activeSlotId) ?? null
     : null
 
-  const handleAssign = async (player_id: string) => {
+  const handleAssign = (player_id: string) => {
     if (!activeSlot) return
-    setError(null)
-    try {
-      const res = await fetch('/api/lineups/assign-player', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...adminHeaders(password),
-        },
-        body: JSON.stringify({ slot_id: activeSlot.id, player_id }),
-      })
-      const body = await res.json()
-      if (!res.ok) throw new Error(body.error ?? 'Failed to assign')
-      setActiveSlotId(null)
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to assign')
-    }
+    setSlotPlayer(lineup.id, activeSlot.slot_index, playerKeyFromId(player_id))
+    setActiveSlotId(null)
   }
 
-  const handleClear = async () => {
+  const handleClear = () => {
     if (!activeSlot) return
-    setError(null)
-    try {
-      const res = await fetch('/api/lineups/clear-slot', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...adminHeaders(password),
-        },
-        body: JSON.stringify({ slot_id: activeSlot.id }),
-      })
-      const body = await res.json()
-      if (!res.ok) throw new Error(body.error ?? 'Failed to clear')
-      setActiveSlotId(null)
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to clear')
-    }
+    setSlotPlayer(lineup.id, activeSlot.slot_index, null)
+    setActiveSlotId(null)
   }
 
   const handleSlotClick = (slotId: string) => {
@@ -93,12 +70,6 @@ export default function LineupEditor({ lineup, slots, subs, signups }: Props) {
         </h2>
         <p className="text-xs text-slate-500 font-mono mt-0.5">{lineup.formation}</p>
       </div>
-
-      {error && (
-        <div className="mb-3 px-3 py-2 bg-red-500/10 border border-red-500/30 rounded text-xs text-red-300">
-          {error}
-        </div>
-      )}
 
       <PitchSVG
         starters={starters}
@@ -166,7 +137,7 @@ export default function LineupEditor({ lineup, slots, subs, signups }: Props) {
             formationSpec[activeSlot.slot_index]?.position_code ??
             activeSlot.position_code
           }
-          signups={signups}
+          players={players}
           assignedPlayerIds={assignedPlayerIds}
           currentPlayerId={activeSlot.player_id}
           playerById={playerById}

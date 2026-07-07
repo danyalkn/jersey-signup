@@ -1,12 +1,13 @@
 'use client'
 
 import type { SlotSpec } from '@/lib/formations'
-import type { JerseySignup, LineupSlot } from '@/lib/supabase'
+import type { LineupPlayer } from '@/lib/roster'
+import type { LineupSlot } from '@/lib/lineupStore'
 
 interface Props {
   starters: LineupSlot[]
   formationSpec: SlotSpec[]
-  playerById: Map<string, JerseySignup>
+  playerById: Map<string, LineupPlayer>
   onSlotClick: (slotId: string) => void
 }
 

@@ -1,17 +1,18 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import type { JerseySignup, LineupSlot } from '@/lib/supabase'
+import type { LineupPlayer } from '@/lib/roster'
+import type { LineupSlot } from '@/lib/lineupStore'
 
 interface Props {
   slot: LineupSlot
   // Label from the formation config (display source of truth — the stored
   // slot.position_code can lag behind config renames).
   positionLabel: string | null
-  signups: JerseySignup[]
+  players: LineupPlayer[]
   assignedPlayerIds: Set<string>
   currentPlayerId: string | null
-  playerById: Map<string, JerseySignup>
+  playerById: Map<string, LineupPlayer>
   onAssign: (player_id: string) => void | Promise<void>
   onClear: () => void | Promise<void>
   onClose: () => void
@@ -20,7 +21,7 @@ interface Props {
 export default function SlotPickerModal({
   slot,
   positionLabel,
-  signups,
+  players,
   assignedPlayerIds,
   currentPlayerId,
   playerById,
@@ -44,7 +45,7 @@ export default function SlotPickerModal({
   }, [onClose])
 
   const lower = query.trim().toLowerCase()
-  const filtered = signups
+  const filtered = players
     .filter((s) => lower === '' || s.player_name.toLowerCase().includes(lower))
     .sort((a, b) => a.jersey_number - b.jersey_number)
 

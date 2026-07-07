@@ -2,8 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { FORMATION_NAMES } from '@/lib/formations'
-import { adminHeaders, useAdmin } from '@/lib/useAdmin'
-import type { Lineup } from '@/lib/supabase'
+import { useAdmin } from '@/lib/useAdmin'
+import {
+  createLineup,
+  deleteLineup,
+  renameLineup,
+  type Lineup,
+} from '@/lib/lineupStore'
 
 interface Props {
   lineups: Lineup[]
@@ -24,14 +29,12 @@ export default function LineupSidebar({
   selectedLineupId,
   onSelect,
 }: Props) {
-  const { isAdmin, password } = useAdmin()
+  const { isAdmin } = useAdmin()
   const [create, setCreate] = useState<CreateState>({ kind: 'idle' })
-  const [busy, setBusy] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
   const [renaming, setRenaming] = useState<{ id: string; value: string } | null>(
     null
   )
-  const [error, setError] = useState<string | null>(null)
   const renameInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -39,12 +42,10 @@ export default function LineupSidebar({
   }, [renaming])
 
   const startCreate = () => {
-    setError(null)
     setCreate({ kind: 'picking-formation', query: '' })
   }
   const cancelCreate = () => {
     setCreate({ kind: 'idle' })
-    setError(null)
   }
 
   const filteredFormations =
@@ -55,81 +56,24 @@ export default function LineupSidebar({
   const pickFormation = (formation: string) =>
     setCreate({ kind: 'picking-name', formation, name: '' })
 
-  const submitCreate = async () => {
+  const submitCreate = () => {
     if (create.kind !== 'picking-name') return
     if (create.name.trim().length === 0) return
-    setBusy(true)
-    setError(null)
-    try {
-      const res = await fetch('/api/lineups/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...adminHeaders(password),
-        },
-        body: JSON.stringify({
-          name: create.name.trim(),
-          formation: create.formation,
-        }),
-      })
-      const body = await res.json()
-      if (!res.ok) throw new Error(body.error ?? 'Failed to create lineup')
-      onSelect(body.data.id)
-      setCreate({ kind: 'idle' })
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to create lineup')
-    } finally {
-      setBusy(false)
-    }
+    const id = createLineup(create.name.trim(), create.formation)
+    if (id) onSelect(id)
+    setCreate({ kind: 'idle' })
   }
 
-  const deleteLineup = async (id: string) => {
-    setBusy(true)
-    setError(null)
-    try {
-      const res = await fetch('/api/lineups/delete', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...adminHeaders(password),
-        },
-        body: JSON.stringify({ lineup_id: id }),
-      })
-      const body = await res.json()
-      if (!res.ok) throw new Error(body.error ?? 'Failed to delete')
-      if (selectedLineupId === id) onSelect(null)
-      setConfirmDelete(null)
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to delete')
-    } finally {
-      setBusy(false)
-    }
+  const handleDelete = (id: string) => {
+    deleteLineup(id)
+    if (selectedLineupId === id) onSelect(null)
+    setConfirmDelete(null)
   }
 
-  const submitRename = async () => {
+  const submitRename = () => {
     if (!renaming || renaming.value.trim().length === 0) return
-    setBusy(true)
-    setError(null)
-    try {
-      const res = await fetch('/api/lineups/rename', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...adminHeaders(password),
-        },
-        body: JSON.stringify({
-          lineup_id: renaming.id,
-          name: renaming.value.trim(),
-        }),
-      })
-      const body = await res.json()
-      if (!res.ok) throw new Error(body.error ?? 'Failed to rename')
-      setRenaming(null)
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to rename')
-    } finally {
-      setBusy(false)
-    }
+    renameLineup(renaming.id, renaming.value.trim())
+    setRenaming(null)
   }
 
   return (
@@ -212,7 +156,7 @@ export default function LineupSidebar({
               <div className="flex gap-2">
                 <button
                   onClick={submitCreate}
-                  disabled={busy || create.name.trim().length === 0}
+                  disabled={create.name.trim().length === 0}
                   className="flex-1 px-3 py-2 text-sm font-bold bg-blue-600 text-white rounded-lg hover:bg-blue-500 disabled:opacity-40 transition-colors"
                 >
                   Create
@@ -227,10 +171,6 @@ export default function LineupSidebar({
             </div>
           )}
         </div>
-      )}
-
-      {error && (
-        <div className="text-xs text-red-300 px-1 mb-2">{error}</div>
       )}
 
       <ul className="space-y-1">
@@ -284,7 +224,6 @@ export default function LineupSidebar({
                     onClick={(e) => {
                       e.stopPropagation()
                       setRenaming({ id: l.id, value: l.name })
-                      setError(null)
                     }}
                     className="text-slate-600 hover:text-blue-400 transition-colors p-1"
                     title="Rename lineup"
@@ -337,7 +276,7 @@ export default function LineupSidebar({
                 >
                   <button
                     onClick={submitRename}
-                    disabled={busy || renaming!.value.trim().length === 0}
+                    disabled={renaming!.value.trim().length === 0}
                     className="text-xs font-bold text-blue-400 hover:text-blue-300 disabled:opacity-40 px-1.5 py-0.5"
                   >
                     Save
@@ -357,8 +296,7 @@ export default function LineupSidebar({
                   className="flex items-center gap-1"
                 >
                   <button
-                    onClick={() => deleteLineup(l.id)}
-                    disabled={busy}
+                    onClick={() => handleDelete(l.id)}
                     className="text-xs font-bold text-red-400 hover:text-red-300 px-1.5 py-0.5"
                   >
                     Delete
